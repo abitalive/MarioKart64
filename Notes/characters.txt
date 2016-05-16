@@ -1,0 +1,8 @@
+00 Mario
+01 Luigi
+02 Yoshi
+03 Toad
+04 D.K.
+05 Wario
+06 Peach
+07 Bowser

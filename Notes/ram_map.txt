@@ -1,0 +1,23 @@
+800DC524 w Menu modifier
+800DC52C w Player count selection (00,01,03)
+800DC530 w Player count selection (00,01,03)
+800DC538 w Player count selection (01-04)
+800DC53C w Mode selection (00-03)
+800DC598 f Course timer
+800DC5A0 h Course selection (00-13)
+800F6910 16b Player 1 input
+800F6920 16b Player 2 input
+800F6930 16b Player 3 input
+800F6940 16b Player 4 input
+80150148 w Aspect ratio (3FAAAAAB,402AAAAB)
+801643BA h Player 1 place (00-07)
+801643BE h Player 2 place (00-07)
+801643C2 h Player 3 place (00-07)
+801643C6 h Player 4 place (00-07)
+801643CA h Player 5 place (00-07)
+801643CE h Player 6 place (00-07)
+801643D2 h Player 7 place (00-07)
+801643D6 h Player 8 place (00-07)
+8018EDF3 b Player count selection (01-04)
+8018EE09 b Cup selection (00-04)
+8018EE0B b Course selection (00-03)

@@ -1,0 +1,20 @@
+00 Mario Raceway
+01 Choco Mountain
+02 Bowser's Castle
+03 Banshee Boardwalk
+04 Yoshi Valley
+05 Frappe Snowland
+06 Koopa Troopa Beach
+07 Royal Raceway
+08 Luigi Raceway
+09 Moo Moo Farm
+0A Toad's Turnpike
+0B Kalimari Desert
+0C Sherbet Land
+0D Rainbow Road
+0E Wario Stadium
+0F Block Fort
+10 Skyscraper
+11 Double Deck
+12 D.K.'S Jungle Parkway
+13 Big Donut
