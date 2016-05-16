@@ -17,6 +17,11 @@ macro asciiz(string) {
   db {string}, 0x00
 }
 
+macro CheckSetting(reg, setting) {
+  lui {reg}, 0x8050
+  lb {reg}, {setting} ({reg})
+}
+
 // DMA
 origin 0x0029F0
 base 0x80001DF0 // Disable resource display function
@@ -321,8 +326,7 @@ MenuEnd:
 RandomTracks:
 addiu sp, sp, -0x0018
 sw ra, 0x0014 (sp)
-lui t0, 0x8050
-lb t0, 0x0001 (t0)
+CheckSetting(t0, 1)
 addiu t1, r0, 0x0002
 bne t0, t1, RandomTracksEnd
 RandomTracksMode:
@@ -358,8 +362,7 @@ RandomTracksEnd:
 
 // Scaling Fix
 ScalingFix1p:
-lui t5, 0x8050
-lb t5, 0x0002 (t5)
+CheckSetting(t5, 2)
 addiu t7, r0, 0x0002
 beq t5, t7, ScalingFix1p30
 nop
@@ -381,8 +384,7 @@ ScalingFix1pEnd:
   nop
 
 ScalingFix2p:
-lui t8, 0x8050
-lb t8, 0x0002 (t8)
+CheckSetting(t8, 2)
 addiu t1, r0, 0x0002
 beq t8, t1, ScalingFix2p30
 nop
@@ -404,8 +406,7 @@ ScalingFix2pEnd:
   nop
 
 ScalingFix3p:
-lui t9, 0x8050
-lb t9, 0x0002 (t9)
+CheckSetting(t9, 2)
 addiu t2, r0, 0x0002
 beq t9, t2, ScalingFix3p30
 nop
@@ -434,8 +435,7 @@ addiu t1, r0, 0x0002
 beq t0, t1, Widescreen2p
 nop
 Widescreen1p:
-  lui t0, 0x8050
-  lb t0, 0x0003 (t0)
+  CheckSetting(t0, 3)
   addiu t1, r0, 0x0002
   beq t0, t1, Widescreen1pEnabled
   nop
@@ -447,8 +447,7 @@ Widescreen1p:
     b WidescreenEnd
     nop
 Widescreen2p:
-  lui t0, 0x8050
-  lb t0, 0x0003 (t0)
+  CheckSetting(t0, 3)
   addiu t1, r0, 0x0002
   beq t0, t1, Widescreen2pEnabled
   nop
@@ -463,8 +462,7 @@ WidescreenEnd:
 
 // Skip Trophy Ceremony
 SkipTrophy:
-lui t0, 0x8050
-lb t0, 0x0004 (t0)
+CheckSetting(t0, 4)
 addiu t1, r0, 0x0002
 beq t0, t1, SkipTrophyEnabled
 nop
@@ -490,8 +488,7 @@ SameCharacterEnd:
 
 // Multiplayer Music
 MultiplayerMusic:
-lui t0, 0x8050
-lb t0, 0x0005 (t0)
+CheckSetting(t0, 5)
 addiu t1, r0, 0x0002
 beq t0, t1, MultiplayerMusicEnabled
 nop
@@ -506,8 +503,7 @@ MultiplayerMusicEnd:
   nop
 
 MultiplayerMusicL:
-lui t2, 0x8050
-lb t2, 0x0005 (t2)
+CheckSetting(t2, 5)
 addiu t1, r0, 0x0002
 beq t2, t1, MultiplayerMusicLEnabled
 nop
@@ -523,8 +519,7 @@ MultiplayerMusicLEnd:
 
 // Multiplayer KD Train
 MultiplayerTrain:
-lui t0, 0x8050
-lb t0, 0x0006 (t0)
+CheckSetting(t0, 6)
 addiu t1, r0, 0x0002
 beq t0, t1, MultiplayerTrainEnabled
 nop
@@ -540,8 +535,7 @@ MultiplayerTrainEnd:
 
 // Multiplayer DKJP Boat
 MultiplayerBoat:
-lui a0, 0x8050
-lb a0, 0x0007 (a0)
+CheckSetting(a0, 7)
 addiu at, r0, 0x0002
 beq a0, at, MultiplayerBoatEnabled
 nop
@@ -560,8 +554,7 @@ addiu sp, sp, -0x0018
 sw ra, 0x0014 (sp)
 jal 0x80290388
 nop
-lui a0, 0x8050
-lb a0, 0x0008 (a0)
+CheckSetting(a0, 8)
 addiu at, r0, 0x0002
 bne a0, at, VsAllCupsEnd
 nop
@@ -605,8 +598,7 @@ VsAllCupsEnd:
 
 // Versus Timer
 VsTimer:
-lui t0, 0x8050
-lb t0, 0x0009 (t0)
+CheckSetting(t0, 9)
 addiu t1, r0, 0x0002
 beq t0, t1, VsTimerEnabled
 nop
@@ -621,8 +613,7 @@ VsTimerEnd:
 
 // Gold Mushroom
 GoldMushroom:
-lui t0, 0x8050
-lb t0, 0x000A (t0)
+CheckSetting(t0, 10)
 addiu t1, r0, 0x0002
 beq t0, t1, GoldMushroomSmall
 nop
