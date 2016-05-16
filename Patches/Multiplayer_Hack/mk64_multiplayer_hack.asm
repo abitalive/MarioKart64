@@ -17,7 +17,7 @@ macro asciiz(string) {
   db {string}, 0x00
 }
 
-macro CheckSetting(reg, setting) {
+macro GetSetting(reg, setting) {
   lui {reg}, 0x8050
   lb {reg}, {setting} ({reg})
 }
@@ -34,28 +34,28 @@ nop
 
 origin 0x004704 // Replaces resource display function
 base ResourceDisplay1
-addiu sp, sp, -0x0018
-sw ra, 0x0014 (sp)
+addiu sp, -0x18
+sw ra, 0x14 (sp)
 jal 0x800010CC
 nop
 la a0, 0x80400000 // RAM destination (0x80400000)
-la a1, 0x00BE9170 // ROM source (0xBE9170)
-lui a2, 0x0001
+li a1, 0xBE9170 // ROM source (0xBE9170)
+li a2, 0x16E90 // Size (0x16E90)
 jal DmaCopy
-ori a2, a2,0x6E90 // Size (0x16E90)
+nop
 
 // Menu Init
 lui t0, 0x8050
-addiu t1, t0, 0x0010
+addiu t1, t0, 0x10
 la t2, 0x01010101
 MenuInitLoop:
-  sw t2, 0x0000 (t0)
-  addiu t0, t0, 0x0004
+  sw t2, 0 (t0)
+  addiu t0, 0x04
   bne t0, t1, MenuInitLoop
   nop
-lw ra, 0x0014 (sp)
+lw ra, 0x14 (sp)
 jr ra
-addiu sp, sp, 0x0018
+addiu sp, 0x18
 
 // Menu Strings
 //
@@ -189,76 +189,75 @@ nop
 
 origin 0xBE9170
 base 0x80400000
-addiu sp, sp, -0x0018
-sw ra, 0x0014 (sp)
+addiu sp, -0x18
+sw ra, 0x14 (sp)
 jal 0x800A8230
 nop
 jal LoadDebugFont
 nop
 la t0, MenuStrings // Array start
-addiu t1, r0, 0x0001 // Entry number
-addiu a1, r0, 0x0064 // Y coord
+addiu t1, r0, 0x01 // Entry number
+addiu a1, r0, 0x64 // Y coordinate
 MenuArrayLoop:
-  lw t2, 0x0004 (t0) // Entry character string
+  lw t2, 0x04 (t0) // Entry character string
   beq t2, r0, MenuInput
   nop
   lui t3, 0x8050
   addu t3, t3, t1
-  lb t3, 0x0000 (t3)
-  sll t3, t3, 0x2
-  addiu t3, t3, 0x0004
+  lb t3, 0 (t3)
+  sll t3, 0x02
+  addiu t3, 0x04
   addu t3, t0, t3 // Pointer to setting character string
-  lw t3, 0x0000 (t3) // Setting character string
-  sw t0, 0x0018 (sp) // Array position
-  sw t1, 0x001C (sp) // Entry number
-  sw a1, 0x0020 (sp) // Y coord
-  sw t2, 0x0024 (sp) // Entry character string
-  sw t3, 0x0028 (sp) // Setting character string
+  lw t3, 0 (t3) // Setting character string
+  sw t0, 0x18 (sp) // Array position
+  sw t1, 0x1C (sp) // Entry number
+  sw a1, 0x20 (sp) // Y coordinate
+  sw t2, 0x24 (sp) // Entry character string
+  sw t3, 0x28 (sp) // Setting character string
   PrintCursor:
     lui t4, 0x8050
-    lb t4, 0x0000 (t4)
+    lb t4, 0 (t4)
     bne t1, t4, PrintEntry
     nop
-    addiu a0, r0, 0x0046 // X coord
+    addiu a0, r0, 0x46 // X coordinate
     la a2, 0x800F0B64
     jal DebugPrintStringCoord
     nop
-    lw a1, 0x0020 (sp) // Y coord
-    lw t2, 0x0024 (sp) // Entry character string
+    lw a1, 0x20 (sp) // Y coordinate
+    lw t2, 0x24 (sp) // Entry character string
   PrintEntry:
-    addiu a0, r0, 0x0050 // X coord
+    addiu a0, r0, 0x50 // X coordinate
     addu a2, t2, r0 // Entry character string
     jal DebugPrintStringCoord
     nop
   PrintSetting:
-    addiu a0, r0, 0x00AA // X coord
-    lw a1, 0x0020 (sp) // Y coord
-    lw a2, 0x0028 (sp) // Setting character string
+    addiu a0, r0, 0xAA // X coordinate
+    lw a1, 0x20 (sp) // Y coordinate
+    lw a2, 0x28 (sp) // Setting character string
     jal DebugPrintStringCoord
     nop
-  lw t0, 0x0018 (sp) // Array position
-  addiu t0, t0, 0x0018
-  lw t1, 0x001C (sp) // Entry number
-  addiu t1, 0x0001
-  lw a1, 0x0020 (sp) // Y coord
-  addiu a1, a1, 0x000A
+  lw t0, 0x18 (sp) // Array position
+  addiu t0, 0x18
+  lw t1, 0x1C (sp) // Entry number
+  addiu t1, 0x01
+  lw a1, 0x20 (sp) // Y coordinate
+  addiu a1, 0x0A
   b MenuArrayLoop
   nop
 MenuInput:
   lui t0, 0x8050
-  lui t1, 0x800F
-  addiu t1, t1, 0x6910 // Controller structs
+  la t1, 0x800F6910 // Controller structs
   MenuInputLoop:
-    lh t2, 0x0006 (t1) // Current input
-    lb t3, 0x0000 (t0) // Cursor flag
+    lh t2, 0x06 (t1) // Current input
+    lb t3, 0 (t0) // Cursor flag
     MenuInputUp:
       addiu t4, r0, 0x0800
       bne t2, t4, MenuInputDown
       nop
-      addiu t3, t3, -0x0001
+      addiu t3, -0x01
       beq t3, r0, MenuInputLoopEnd
       nop
-      sb t3, 0x0000(t0)
+      sb t3, 0 (t0)
     MenuInputDown:
       addiu t4, r0, 0x0400
       bne t2, t4, MenuInputLeft
@@ -266,107 +265,107 @@ MenuInput:
       la t4, MenuStrings
       addu t5, r0, r0
       MenuInputDownLoop:
-        lw t6, 0x0000 (t4)
+        lw t6, 0 (t4)
         beq t6, r0, MenuInputDownLoopEnd
         nop
-        addiu t5, t5, 0x0001
-        addiu t4, t4, 0x0018
+        addiu t5, 0x01
+        addiu t4, 0x18
         b MenuInputDownLoop
         nop
         MenuInputDownLoopEnd:
       beq t3, t5, MenuInputLoopEnd
       nop
-      addiu t3, t3, 0x0001
-      sb t3, 0x0000 (t0)
+      addiu t3, 0x01
+      sb t3, 0 (t0)
     MenuInputLeft:
       addiu t4, r0, 0x0200
       bne t2, t4, MenuInputRight
       nop
       addu t4, t0, t3
-      lb t5, 0x0000 (t4)
-      addiu t5, t5, -0x0001
+      lb t5, 0 (t4)
+      addiu t5, -0x01
       beq t5, r0, MenuInputLoopEnd
       nop
-      sb t5, 0x0000 (t4)
+      sb t5, 0 (t4)
     MenuInputRight:
       addiu t4, r0, 0x0100
       bne t2, t4, MenuInputLoopEnd
       nop
       addu t4, t0, t3
-      lb t5, 0x0000 (t4)
-      addiu t6, r0, 0x0001
+      lb t5, 0 (t4)
+      addiu t6, r0, 0x01
       la t7, MenuStrings
-      addiu t7, t7, 0x0003
+      addiu t7, 0x03
       MenuInputRightLoop:
         beq t3, t6, MenuInputRightLoopEnd
         nop
-        addiu t6, t6, 0x0001
-        addiu t7, t7, 0x0018
+        addiu t6, 0x01
+        addiu t7, 0x18
         b MenuInputRightLoop
         nop
         MenuInputRightLoopEnd:
-      lb t7, 0x0000 (t7)
+      lb t7, 0 (t7)
       beq t7, t5, MenuInputLoopEnd
       nop
-      addiu t5, t5, 0x0001
-      sb t5, 0x0000 (t4)
+      addiu t5, 0x01
+      sb t5, 0 (t4)
     MenuInputLoopEnd:
   la t4, 0x800F6940
   beq t1, t4, MenuEnd
   nop
-  addiu t1, t1, 0x0010
+  addiu t1, 0x10
   b MenuInputLoop
   nop
 MenuEnd:
-  lw ra, 0x0014 (sp)
+  lw ra, 0x14 (sp)
   jr ra
-  addiu sp, sp, 0x0018
+  addiu sp, 0x18
 
 // Random Tracks
 RandomTracks:
-addiu sp, sp, -0x0018
-sw ra, 0x0014 (sp)
-CheckSetting(t0, 1)
-addiu t1, r0, 0x0002
+addiu sp, -0x18
+sw ra, 0x14 (sp)
+GetSetting(t0, 1)
+addiu t1, r0, 0x02
 bne t0, t1, RandomTracksEnd
 RandomTracksMode:
   lui t0, 0x800E
   lw t0, 0xC53C (t0)
-  addiu t1, r0, 0x0003 // Battle
+  addiu t1, r0, 0x03 // Battle
   bne t0, t1, RandomTracksVs
   nop
 RandomTracksBattle:
   jal Random
-  addiu a0, r0, 0x0004 // Range 0x00-0x03
-  addiu v0, v0, 0x0010 //
-  addiu t0, r0, 0x0012
+  addiu a0, r0, 0x04 // Range 0x00-0x03
+  addiu v0, 0x10
+  addiu t0, r0, 0x12
   bne v0, t0, RandomTracksStore
   nop
-  addiu v0, r0, 0x000f // 0x12 = 0x0F (BF)
+  addiu v0, r0, 0x0F // 0x12 = 0x0F (BF)
   b RandomTracksStore
   nop
 RandomTracksVs:
   jal Random
-  addiu a0, r0, 0x0010 // Range 0x00-0x0F
-  addiu t0, r0, 0x000F
+  addiu a0, r0, 0x10 // Range 0x00-0x0F
+  addiu t0, r0, 0x0F
   bne v0, t0, RandomTracksStore
   nop
-  addiu v0, r0, 0x0012 // 0x0F = 0x12 (DKJP)
+  addiu v0, r0, 0x12 // 0x0F = 0x12 (DKJP)
 RandomTracksStore:
   lui t0, 0x800E
   sh v0, 0xC5A0 (t0)
 RandomTracksEnd:
   lw ra, 0x0014 (sp)
   jr ra
-  addiu sp, sp, 0x0018
+  addiu sp, sp, 0x18
 
 // Scaling Fix
 ScalingFix1p:
-CheckSetting(t5, 2)
-addiu t7, r0, 0x0002
+GetSetting(t5, 2)
+addiu t7, r0, 0x02
 beq t5, t7, ScalingFix1p30
 nop
-addiu t7, r0, 0x0003
+addiu t7, r0, 0x03
 beq t5, t7, ScalingFix1p60
 nop
 lui t7, 0x8015
@@ -374,21 +373,21 @@ lw t7, 0x0114 (t7)
 b ScalingFix1pEnd
 nop
 ScalingFix1p30:
-  addiu t7, r0, 0x0002
+  addiu t7, r0, 0x02
   b ScalingFix1pEnd
   nop
 ScalingFix1p60:
-  addiu t7, r0, 0x0001
+  addiu t7, r0, 0x01
 ScalingFix1pEnd:
   jr ra
   nop
 
 ScalingFix2p:
-CheckSetting(t8, 2)
-addiu t1, r0, 0x0002
+GetSetting(t8, 2)
+addiu t1, r0, 0x02
 beq t8, t1, ScalingFix2p30
 nop
-addiu t1, r0, 0x0003
+addiu t1, r0, 0x03
 beq t8, t1, ScalingFix2p60
 nop
 lui t1, 0x8015
@@ -396,21 +395,21 @@ lw t1, 0x0114 (t1)
 b ScalingFix2pEnd
 nop
 ScalingFix2p30:
-  addiu t1, r0, 0x0002
+  addiu t1, r0, 0x02
   b ScalingFix2pEnd
   nop
 ScalingFix2p60:
-  addiu t1, r0, 0x0001
+  addiu t1, r0, 0x01
 ScalingFix2pEnd:
   jr ra
   nop
 
 ScalingFix3p:
-CheckSetting(t9, 2)
-addiu t2, r0, 0x0002
+GetSetting(t9, 2)
+addiu t2, r0, 0x02
 beq t9, t2, ScalingFix3p30
 nop
-addiu t2, r0, 0x0003
+addiu t2, r0, 0x03
 beq t9, t2, ScalingFix3p60
 nop
 lui t2, 0x8015
@@ -418,11 +417,11 @@ lw t2, 0x0114 (t2)
 b ScalingFix3pEnd
 nop
 ScalingFix3p30:
-  addiu t2, r0, 0x0002
+  addiu t2, r0, 0x02
   b ScalingFix3pEnd
   nop
 ScalingFix3p60:
-  addiu t2, r0, 0x0001
+  addiu t2, r0, 0x01
 ScalingFix3pEnd:
   jr ra
   nop
@@ -431,46 +430,46 @@ ScalingFix3pEnd:
 Widescreen:
 lui t0, 0x800E
 lw t0, 0xC538 (t0) // Check players
-addiu t1, r0, 0x0002
+addiu t1, r0, 0x02
 beq t0, t1, Widescreen2p
 nop
 Widescreen1p:
-  CheckSetting(t0, 3)
-  addiu t1, r0, 0x0002
+  GetSetting(t0, 3)
+  addiu t1, r0, 0x02
   beq t0, t1, Widescreen1pEnabled
   nop
-  la a3, 0x3FAAAAAB // Return 3FAAAAAB
+  li a3, 0x3FAAAAAB // Return 3FAAAAAB
   b WidescreenEnd
   nop
   Widescreen1pEnabled:
-    la a3, 0x3FDFAAAB // Return 3FDFAAAB
+    li a3, 0x3FDFAAAB // Return 3FDFAAAB
     b WidescreenEnd
     nop
 Widescreen2p:
-  CheckSetting(t0, 3)
-  addiu t1, r0, 0x0002
+  GetSetting(t0, 3)
+  addiu t1, r0, 0x02
   beq t0, t1, Widescreen2pEnabled
   nop
-  la a3, 0x402AAAAB // Return 402AAAAB
+  li a3, 0x402AAAAB // Return 402AAAAB
   b WidescreenEnd
   nop
   Widescreen2pEnabled:
-    la a3, 0x4060AAAB // Return 4060AAAB
+    li a3, 0x4060AAAB // Return 4060AAAB
 WidescreenEnd:
   jr ra
   nop
 
 // Skip Trophy Ceremony
 SkipTrophy:
-CheckSetting(t0, 4)
-addiu t1, r0, 0x0002
+GetSetting(t0, 4)
+addiu t1, r0, 0x02
 beq t0, t1, SkipTrophyEnabled
 nop
-addiu t7, r0, 0x0005
+addiu t7, r0, 0x05
 b SkipTrophyEnd
 nop
 SkipTrophyEnabled:
-  addiu t7, r0, 0x0001
+  addiu t7, r0, 0x01
 SkipTrophyEnd:
   j 0x8028E3DC
   nop
@@ -479,17 +478,17 @@ SkipTrophyEnd:
 SameCharacter:
 lui a0, 0x4900
 beq v0, r0, SameCharacterEnd
-sb s0, 0x0000 (t9)
+sb s0, 0 (t9)
 jal 0x800C8E10 // Play sound
-ori a0, a0, 0x8000 // Volume
+ori a0, 0x8000 // Volume
 SameCharacterEnd:
   j 0x800B3A50
   nop
 
 // Multiplayer Music
 MultiplayerMusic:
-CheckSetting(t0, 5)
-addiu t1, r0, 0x0002
+GetSetting(t0, 5)
+addiu t1, r0, 0x02
 beq t0, t1, MultiplayerMusicEnabled
 nop
 lui t6, 0x800E
@@ -497,14 +496,14 @@ lw t6, 0xC530 (t6)
 b MultiplayerMusicEnd
 nop
 MultiplayerMusicEnabled:
-  addiu t6, r0, 0x0001
+  addiu t6, r0, 0x01
 MultiplayerMusicEnd:
   j 0x8028ECA0
   nop
 
 MultiplayerMusicL:
-CheckSetting(t2, 5)
-addiu t1, r0, 0x0002
+GetSetting(t2, 5)
+addiu t1, r0, 0x02
 beq t2, t1, MultiplayerMusicLEnabled
 nop
 lui t1, 0x800E
@@ -512,15 +511,15 @@ lw t1, 0xC52C (t1)
 b MultiplayerMusicLEnd
 nop
 MultiplayerMusicLEnabled:
-  addiu t1, r0, 0x0001
+  addiu t1, r0, 0x01
 MultiplayerMusicLEnd:
   j 0x8028F9C8
   nop
 
 // Multiplayer KD Train
 MultiplayerTrain:
-CheckSetting(t0, 6)
-addiu t1, r0, 0x0002
+GetSetting(t0, 6)
+addiu t1, r0, 0x02
 beq t0, t1, MultiplayerTrainEnabled
 nop
 lui v0, 0x800E
@@ -535,33 +534,33 @@ MultiplayerTrainEnd:
 
 // Multiplayer DKJP Boat
 MultiplayerBoat:
-CheckSetting(a0, 7)
-addiu at, r0, 0x0002
+GetSetting(a0, 7)
+addiu at, r0, 0x02
 beq a0, at, MultiplayerBoatEnabled
 nop
-slti at, t7, 0x0003
+slti at, t7, 0x03
 b MultiplayerBoatEnd
 nop
 MultiplayerBoatEnabled:
-  addiu at, r0, 0x0001
+  addiu at, r0, 0x01
 MultiplayerBoatEnd:
   j 0x80013360
   nop
 
 // Versus All Cups
 VsAllCups:
-addiu sp, sp, -0x0018
-sw ra, 0x0014 (sp)
+addiu sp, -0x18
+sw ra, 0x14 (sp)
 jal 0x80290388
 nop
-CheckSetting(a0, 8)
-addiu at, r0, 0x0002
+GetSetting(a0, 8)
+addiu at, r0, 0x02
 bne a0, at, VsAllCupsEnd
 nop
 VsAllCupsMode:
   lui t0, 0x800E
   lw t0, 0xC53C (t0)
-  addiu t1, r0, 0x0002 // Versus
+  addiu t1, r0, 0x02 // Versus
   bne t0, t1, VsAllCupsEnd
   nop
 VsAllCupsRr: // Set cup and track to zero if track = RR
@@ -570,7 +569,7 @@ VsAllCupsRr: // Set cup and track to zero if track = RR
   lb t2, 0xEE0B (t0) // Load track
   lui t3, 0x800E
   lb t3, 0xC5A1 (t3)
-  addiu t4, r0, 0x000D
+  addiu t4, r0, 0x0D
   bne t1, t4, VsAllCupsRrEnd // Check track
   nop
   sb r0, 0xEE09 (t0)
@@ -579,30 +578,30 @@ VsAllCupsRr: // Set cup and track to zero if track = RR
   nop
   VsAllCupsRrEnd:
 VsAllCupsCup: // Increment cup if track = 3
-  addiu t3, r0, 0x0003
+  addiu t3, r0, 0x03
   bne t2, t3, VsAllCupsCupEnd // Check track
   nop
-  addiu t1, t1, 0x0001
+  addiu t1, 0x01
   sb t1, 0xEE09 (t0)
   sb r0, 0xEE0B (t0)
   b VsAllCupsEnd
   nop
   VsAllCupsCupEnd:
 VsAllCupsTrack: // Otherwise increment track
-  addiu t2, t2, 0x0001
+  addiu t2, 0x01
   sb t2, 0xEE0B (t0)
 VsAllCupsEnd:
-  lw ra, 0x0014 (sp)
+  lw ra, 0x14 (sp)
   jr ra
-  addiu sp, sp, 0x0018
+  addiu sp, 0x18
 
 // Versus Timer
 VsTimer:
-CheckSetting(t0, 9)
-addiu t1, r0, 0x0002
+GetSetting(t0, 9)
+addiu t1, r0, 0x02
 beq t0, t1, VsTimerEnabled
 nop
-addiu at, r0, 0x0002
+addiu at, r0, 0x02
 b VsTimerEnd
 nop
 VsTimerEnabled:
@@ -613,11 +612,11 @@ VsTimerEnd:
 
 // Gold Mushroom
 GoldMushroom:
-CheckSetting(t0, 10)
-addiu t1, r0, 0x0002
+GetSetting(t0, 10)
+addiu t1, r0, 0x02
 beq t0, t1, GoldMushroomSmall
 nop
-addiu t1, r0, 0x0003
+addiu t1, r0, 0x03
 beq t0, t1, GoldMushroomBig
 nop
 ori t8, t7, 0x0200
@@ -628,7 +627,7 @@ GoldMushroomSmall:
   b GoldMushroomEnd
   nop
 GoldMushroomBig:
-  lui t0, 0x0002
+  lui t0, 0x02
   or t8, t8, t0
 GoldMushroomEnd:
   j 0x802B30D4
