@@ -5,6 +5,9 @@ endian msb
 include "..\LIB\N64.inc"
 
 constant DmaCopy(0x80001158)
+constant ResourceDisplay1(0x80003B04)
+constant LoadDebugFont(0x80057710)
+constant DebugPrintStringCoord(0x800577A4)
 constant Random(0x802B7E34)
 
 origin 0x0
@@ -21,12 +24,11 @@ nop
 
 origin 0x001E6C
 base 0x8000126C
-jal ResourceDisplay
+jal ResourceDisplay1
 nop
 
 origin 0x004704 // Replaces resource display function
-base 0x80003B04
-ResourceDisplay:
+base ResourceDisplay1
 addiu sp, sp, -0x0018
 sw ra, 0x0014 (sp)
 jal 0x800010CC
@@ -186,7 +188,7 @@ addiu sp, sp, -0x0018
 sw ra, 0x0014 (sp)
 jal 0x800A8230
 nop
-jal 0x80057710 // mk64_debug_text_preface
+jal LoadDebugFont
 nop
 la t0, MenuStrings // Array start
 addiu t1, r0, 0x0001 // Entry number
@@ -214,20 +216,20 @@ MenuArrayLoop:
     nop
     addiu a0, r0, 0x0046 // X coord
     la a2, 0x800F0B64
-    jal 0x800577A4 // mk64_draw_debug_text
+    jal DebugPrintStringCoord
     nop
     lw a1, 0x0020 (sp) // Y coord
     lw t2, 0x0024 (sp) // Entry character string
   PrintEntry:
     addiu a0, r0, 0x0050 // X coord
     addu a2, t2, r0 // Entry character string
-    jal 0x800577A4 // mk64_draw_debug_text
+    jal DebugPrintStringCoord
     nop
   PrintSetting:
     addiu a0, r0, 0x00AA // X coord
     lw a1, 0x0020 (sp) // Y coord
     lw a2, 0x0028 (sp) // Setting character string
-    jal 0x800577A4 // mk64_draw_debug_text
+    jal DebugPrintStringCoord
     nop
   lw t0, 0x0018 (sp) // Array position
   addiu t0, t0, 0x0018
