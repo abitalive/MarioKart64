@@ -103,6 +103,12 @@ dd 0x00000003 // Gold Mushroom
 dd MenuEntry10
 dd MenuEntry10Setting1, MenuEntry10Setting2, MenuEntry10Setting3, 0x00000000
 
+dd 0x00000009 // Items
+dd MenuEntry11
+dd MenuEntry11Setting1, MenuEntry11Setting2, MenuEntry11Setting3, MenuEntry11Setting4
+dd MenuEntry11Setting5, MenuEntry11Setting6, MenuEntry11Setting7, MenuEntry11Setting8
+dd MenuEntry11Setting9, 0x00000000
+
 dd 0x00000000, 0x00000000
 
 MenuEntry1:
@@ -178,6 +184,27 @@ MenuEntry10Setting2:
 asciiz("feather small")
 MenuEntry10Setting3:
 asciiz("feather big")
+
+MenuEntry11:
+asciiz("items")
+MenuEntry11Setting1:
+asciiz("default")
+MenuEntry11Setting2:
+asciiz("player 1")
+MenuEntry11Setting3:
+asciiz("player 2")
+MenuEntry11Setting4:
+asciiz("player 3")
+MenuEntry11Setting5:
+asciiz("player 4")
+MenuEntry11Setting6:
+asciiz("player 5")
+MenuEntry11Setting7:
+asciiz("player 6")
+MenuEntry11Setting8:
+asciiz("player 7")
+MenuEntry11Setting9:
+asciiz("player 8")
 
 fill 0x800040C0 - pc() // Zero fill remainder of resource display function
 
@@ -653,6 +680,20 @@ GoldMushroomEnd:
   j 0x802B30D4
   sw t8, 0x000C (a0)
 
+// Items
+Items:
+GetSetting(t0, 11)
+ori t1, r0, 0x0001
+bne t0, t1, ItemsEnabled // If items option disabled
+nop
+b ItemsEnd // Skip
+nop
+ItemsEnabled: // Else set player value to option value - 2
+addiu a0, t0, -0x02
+ItemsEnd:
+j 0x8007ADA8
+nop
+
 fill 0xC00000 - origin() // Zero fill remainder of ROM
 
 // Random Tracks
@@ -784,3 +825,8 @@ base 0x802B3070
 j GoldMushroom
 nop
 nop
+
+// Items
+origin 0x07BB60
+base 0x8007AF60
+jal Items
