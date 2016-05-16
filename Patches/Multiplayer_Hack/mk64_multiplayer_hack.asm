@@ -65,7 +65,7 @@ addiu sp, 0x18
 MenuStrings:
 dd 0x00000002 // Tracks
 dd MenuEntry1
-dd MenuEntry1Setting1, MenuEntry1Setting2, 0x00000000, 0x00000000
+dd MenuEntry1Setting1, MenuEntry1Setting2, 0x00000000
 
 dd 0x00000003 // Scaling
 dd MenuEntry2
@@ -73,31 +73,31 @@ dd MenuEntry2Setting1, MenuEntry2Setting2, MenuEntry2Setting3, 0x00000000
 
 dd 0x00000002 // Widescreen
 dd MenuEntry3
-dd MenuEntry3Setting1, MenuEntry3Setting2, 0x00000000, 0x00000000
+dd MenuEntry3Setting1, MenuEntry3Setting2, 0x00000000
 
 dd 0x00000002 // Trophies
 dd MenuEntry4
-dd MenuEntry4Setting1, MenuEntry4Setting2, 0x00000000, 0x00000000
+dd MenuEntry4Setting1, MenuEntry4Setting2, 0x00000000
 
 dd 0x00000002 // Multiplayer Music
 dd MenuEntry5
-dd MenuEntry5Setting1, MenuEntry5Setting2, 0x00000000, 0x00000000
+dd MenuEntry5Setting1, MenuEntry5Setting2, 0x00000000
 
 dd 0x00000002 // Multiplayer KD Train
 dd MenuEntry6
-dd MenuEntry6Setting1, MenuEntry6Setting2, 0x00000000, 0x00000000
+dd MenuEntry6Setting1, MenuEntry6Setting2, 0x00000000
 
 dd 0x00000002 // Multiplayer DKJP Boat
 dd MenuEntry7
-dd MenuEntry7Setting1, MenuEntry7Setting2, 0x00000000, 0x00000000
+dd MenuEntry7Setting1, MenuEntry7Setting2, 0x00000000
 
 dd 0x00000002 // Versus Tracks
 dd MenuEntry8
-dd MenuEntry8Setting1, MenuEntry8Setting2, 0x00000000, 0x00000000
+dd MenuEntry8Setting1, MenuEntry8Setting2, 0x00000000
 
 dd 0x00000002 // Versus Timer
 dd MenuEntry9
-dd MenuEntry9Setting1, MenuEntry9Setting2, 0x00000000, 0x00000000
+dd MenuEntry9Setting1, MenuEntry9Setting2, 0x00000000
 
 dd 0x00000003 // Gold Mushroom
 dd MenuEntry10
@@ -237,7 +237,14 @@ MenuArrayLoop:
     jal DebugPrintStringCoord
     nop
   lw t0, 0x18 (sp) // Array position
-  addiu t0, 0x18
+  MenuEntryLoop: // Find entry size
+    lw t2, 0 (t0)
+    addiu t0, 0x04
+    beq t2, r0, MenuEntryLoopEnd
+    nop
+    b MenuEntryLoop
+    nop
+    MenuEntryLoopEnd:
   lw t1, 0x1C (sp) // Entry number
   addiu t1, 0x01
   lw a1, 0x20 (sp) // Y coordinate
@@ -269,7 +276,14 @@ MenuInput:
         beq t6, r0, MenuInputDownLoopEnd
         nop
         addiu t5, 0x01
-        addiu t4, 0x18
+        MenuInputDownLoopLoop: // Find entry size
+          lw t8, 0 (t4)
+          addiu t4, 0x04
+          beq t8, r0, MenuInputDownLoopLoopEnd
+          nop
+          b MenuInputDownLoopLoop
+          nop
+          MenuInputDownLoopLoopEnd:
         b MenuInputDownLoop
         nop
         MenuInputDownLoopEnd:
@@ -295,16 +309,22 @@ MenuInput:
       lb t5, 0 (t4)
       addiu t6, r0, 0x01
       la t7, MenuStrings
-      addiu t7, 0x03
       MenuInputRightLoop:
         beq t3, t6, MenuInputRightLoopEnd
         nop
         addiu t6, 0x01
-        addiu t7, 0x18
+        MenuInputRightLoopLoop: // Find entry size
+          lw t8, 0 (t7)
+          addiu t7, 0x04
+          beq t8, r0, MenuInputRightLoopLoopEnd
+          nop
+          b MenuInputRightLoopLoop
+          nop
+          MenuInputRightLoopLoopEnd:
         b MenuInputRightLoop
         nop
         MenuInputRightLoopEnd:
-      lb t7, 0 (t7)
+      lw t7, 0 (t7)
       beq t7, t5, MenuInputLoopEnd
       nop
       addiu t5, 0x01
