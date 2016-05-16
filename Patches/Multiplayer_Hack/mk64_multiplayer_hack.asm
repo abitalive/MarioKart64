@@ -326,9 +326,9 @@ lb t0, 0x0001 (t0)
 addiu t1, r0, 0x0002
 bne t0, t1, RandomTracksEnd
 RandomTracksMode:
-  lui t0, 0x8019
-  lb t0, 0xEE09 (t0)
-  addiu t1, r0, 0x0004 // Battle
+  lui t0, 0x800E
+  lw t0, 0xC53C (t0)
+  addiu t1, r0, 0x0003 // Battle
   bne t0, t1, RandomTracksVs
   nop
 RandomTracksBattle:
