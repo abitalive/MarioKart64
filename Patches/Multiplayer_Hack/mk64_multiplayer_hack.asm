@@ -109,6 +109,10 @@ dd MenuEntry11Setting1, MenuEntry11Setting2, MenuEntry11Setting3, MenuEntry11Set
 dd MenuEntry11Setting5, MenuEntry11Setting6, MenuEntry11Setting7, MenuEntry11Setting8
 dd MenuEntry11Setting9, 0x00000000
 
+dd 0x00000002 // Character Stats
+dd MenuEntry12
+dd MenuEntry12Setting1, MenuEntry12Setting2, 0x00000000
+
 dd 0x00000000, 0x00000000
 
 MenuEntry1:
@@ -206,6 +210,13 @@ asciiz("player 7")
 MenuEntry11Setting9:
 asciiz("player 8")
 
+MenuEntry12:
+asciiz("stats")
+MenuEntry12Setting1:
+asciiz("default")
+MenuEntry12Setting2:
+asciiz("all yoshi")
+
 fill 0x800040C0 - pc() // Zero fill remainder of resource display function
 
 // Menu
@@ -224,7 +235,7 @@ jal LoadDebugFont
 nop
 la t0, MenuStrings // Array start
 addiu t1, r0, 0x01 // Entry number
-addiu a1, r0, 0x64 // Y coordinate
+addiu a1, r0, 0x5A // Y coordinate
 MenuArrayLoop:
   lw t2, 0x04 (t0) // Entry character string
   beq t2, r0, MenuInput
@@ -694,6 +705,45 @@ ItemsEnd:
 j 0x8007ADA8
 nop
 
+// Character Stats
+scope CharacterStats: {
+  addiu sp, -0x18
+  sw ra, 0x14 (sp)
+  jal 0x800010CC
+  nop
+  GetSetting(t0, 12)
+  ori t1, r0, 0x0001
+  bne t0, t1, Enabled
+  nop
+  Disabled: // If 0x80500000 != 0x00 DMA default stats
+    la a0, 0x800E2360 // Destination
+    li a1, 0x0E2F60 // Source
+    li a2, 0x14B0 // Size
+    jal DmaCopy
+    nop
+    b End
+    nop
+  Enabled: // Else DMA new stats
+    la a0, 0x800E2360 // Destination
+    li a1, StatsMain // Source
+    li a2, 0x14B0 // Size
+    jal DmaCopy
+    nop
+    la a0, 0x802B8790 // Destination
+    li a1, StatsWeight // Source
+    li a2, 0x20 // Size
+    jal DmaCopy
+    nop
+  End:
+    lw ra, 0x14 (sp)
+    jr ra
+    addiu sp, 0x18
+}
+
+
+// Character Stats
+include "stats_yoshi.asm"
+
 fill 0xC00000 - origin() // Zero fill remainder of ROM
 
 // Random Tracks
@@ -830,3 +880,9 @@ nop
 origin 0x07BB60
 base 0x8007AF60
 jal Items
+
+// Character Stats
+origin 0x003314
+base 0x80002714
+jal CharacterStats
+nop

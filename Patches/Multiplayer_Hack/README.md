@@ -12,6 +12,9 @@ Mario Kart 64 ROM hack with configuration menu
 - Track Selection: Original / Random
 - Gold Mushroom: Original / Feather (Small) / Feather (Big)
 
+### CHARACTER SELECT Options
+- Character Stats: Original / All Yoshi
+
 ### GP MAP SELECT Options
 - Trophy Ceremony: Enabled / Disabled
 
@@ -32,7 +35,6 @@ Mario Kart 64 ROM hack with configuration menu
   - Multiplayer TT Cars: Original / Full
 
 ### CHARACTER SELECT Options
-- Character Stats: Original / All Lightweight
 - Characters: Menu / Random
 
 ### GAME SELECT Menu Options
