@@ -403,71 +403,65 @@ scope RandomTracks: {
 }
 
 // Scaling Fix
-ScalingFix1p:
-GetSetting(t5, 2)
-addiu t7, r0, 0x02
-beq t5, t7, ScalingFix1p30
-nop
-addiu t7, r0, 0x03
-beq t5, t7, ScalingFix1p60
-nop
-lui t7, 0x8015
-lw t7, 0x0114 (t7)
-b ScalingFix1pEnd
-nop
-ScalingFix1p30:
-  addiu t7, r0, 0x02
-  b ScalingFix1pEnd
-  nop
-ScalingFix1p60:
-  addiu t7, r0, 0x01
-ScalingFix1pEnd:
-  jr ra
-  nop
+scope ScalingFix1p: { // Available registers: t5, at
+  LuiLb(t5, Options+2)
+  Disabled:
+    OriBne(t5, 0x01, at, Fps30) // If option disabled
+    LuiLw(t7, 0x80150114) // Original instructions
+    b End
+    nop
+  Fps30:
+    OriBne(t5, 0x02, at, Fps60) // Else if option set to 30 fps
+    ori t7, r0, 0x02 // Return 2
+    b End
+    nop
+  Fps60:
+    OriBne(t5, 0x03, at, End) // Else if option set to 60 fps
+    ori t7, r0, 0x01 // Return 1
+  End:
+    jr ra
+    nop
+}
 
-ScalingFix2p:
-GetSetting(t8, 2)
-addiu t1, r0, 0x02
-beq t8, t1, ScalingFix2p30
-nop
-addiu t1, r0, 0x03
-beq t8, t1, ScalingFix2p60
-nop
-lui t1, 0x8015
-lw t1, 0x0114 (t1)
-b ScalingFix2pEnd
-nop
-ScalingFix2p30:
-  addiu t1, r0, 0x02
-  b ScalingFix2pEnd
-  nop
-ScalingFix2p60:
-  addiu t1, r0, 0x01
-ScalingFix2pEnd:
-  jr ra
-  nop
+scope ScalingFix2p: { // Available registers: t8, at
+  LuiLb(t8, Options+2)
+  Disabled:
+    OriBne(t8, 0x01, at, Fps30) // If option disabled
+    LuiLw(t1, 0x80150114) // Original instructions
+    b End
+    nop
+  Fps30:
+    OriBne(t8, 0x02, at, Fps60) // Else if option set to 30 fps
+    ori t1, r0, 0x02 // Return 2
+    b End
+    nop
+  Fps60:
+    OriBne(t8, 0x03, at, End) // Else if option set to 60 fps
+    ori t1, r0, 0x01 // Return 1
+  End:
+    jr ra
+    nop
+}
 
-ScalingFix3p:
-GetSetting(t9, 2)
-addiu t2, r0, 0x02
-beq t9, t2, ScalingFix3p30
-nop
-addiu t2, r0, 0x03
-beq t9, t2, ScalingFix3p60
-nop
-lui t2, 0x8015
-lw t2, 0x0114 (t2)
-b ScalingFix3pEnd
-nop
-ScalingFix3p30:
-  addiu t2, r0, 0x02
-  b ScalingFix3pEnd
-  nop
-ScalingFix3p60:
-  addiu t2, r0, 0x01
-ScalingFix3pEnd:
-  jr ra
-  nop
+scope ScalingFix3p: { // Available registers: t9, at
+  LuiLb(t9, Options+2)
+  Disabled:
+    OriBne(t9, 0x01, at, Fps30) // If option disabled
+    LuiLw(t2, 0x80150114) // Original instructions
+    b End
+    nop
+  Fps30:
+    OriBne(t9, 0x02, at, Fps60) // Else if option set to 30 fps
+    ori t2, r0, 0x02 // Return 2
+    b End
+    nop
+  Fps60:
+    OriBne(t9, 0x03, at, End) // Else if option set to 60 fps
+    ori t2, r0, 0x01 // Return 1
+  End:
+    jr ra
+    nop
+}
 
 // Widescreen
 Widescreen:
