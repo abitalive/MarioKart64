@@ -9,6 +9,9 @@ include "..\LIB\macros.inc"
 origin 0x0
 insert "..\LIB\Mario Kart 64 (U) [!].z64"
 
+constant ModeSelection(0x800DC53C)
+constant Options(0x80500000)
+
 macro GetSetting(reg, setting) {
   lui {reg}, 0x8050
   lb {reg}, {setting} ({reg})
@@ -372,42 +375,32 @@ MenuEnd:
   addiu sp, 0x18
 
 // Random Tracks
-RandomTracks:
-addiu sp, -0x18
-sw ra, 0x14 (sp)
-GetSetting(t0, 1)
-addiu t1, r0, 0x02
-bne t0, t1, RandomTracksEnd
-RandomTracksMode:
-  lui t0, 0x800E
-  lw t0, 0xC53C (t0)
-  addiu t1, r0, 0x03 // Battle
-  bne t0, t1, RandomTracksVs
-  nop
-RandomTracksBattle:
-  jal Random
-  addiu a0, r0, 0x04 // Range 0x00-0x03
-  addiu v0, 0x10
-  addiu t0, r0, 0x12
-  bne v0, t0, RandomTracksStore
-  nop
-  addiu v0, r0, 0x0F // 0x12 = 0x0F (BF)
-  b RandomTracksStore
-  nop
-RandomTracksVs:
-  jal Random
-  addiu a0, r0, 0x10 // Range 0x00-0x0F
-  addiu t0, r0, 0x0F
-  bne v0, t0, RandomTracksStore
-  nop
-  addiu v0, r0, 0x12 // 0x0F = 0x12 (DKJP)
-RandomTracksStore:
-  lui t0, 0x800E
-  sh v0, 0xC5A0 (t0)
-RandomTracksEnd:
-  lw ra, 0x0014 (sp)
-  jr ra
-  addiu sp, sp, 0x18
+scope RandomTracks: {
+  LuiLb(t0, Options+1)
+  OriBne(t0, 0x02, t1, End) // Skip if option disabled
+  LuiLw(t0, ModeSelection) // Determine the current mode
+  Versus:
+    OriBne(t0, 0x02, t1, Battle) // If mode == Versus
+    jal Random // Call random function with range 0x00-0x10
+    ori a0, r0, 0x10
+    OriBne(v0, 0x0F, t1, Store) // Store the returned value if != 0x0F (BF)
+    ori v0, r0, 0x12 // Swap 0x0F (BF) with 0x12 (DKJP)
+    b Store
+    nop
+  Battle:
+    OriBne(t0, 0x03, t1, End) // Else if mode == Battle
+    jal Random // Call random function with range 0x00-0x03
+    ori a0, r0, 0x04
+    addiu v0, 0x10 // Add 0x10 to the returned value
+    OriBne(v0, 0x12, t1, Store) // Store the result if != 0x12 (DKJP)
+    ori v0, r0, 0x0F // Swap 0x12 (DKJP) with 0x0F (BF)
+  Store:
+    LuiSh(v0, 0x800DC5A0, t0)
+  End:
+    lw ra, 0x14 (sp)
+    jr ra
+    addiu sp, 0x28
+}
 
 // Scaling Fix
 ScalingFix1p:
@@ -739,8 +732,10 @@ include "stats_yoshi.asm"
 fill 0xC00000 - origin() // Zero fill remainder of ROM
 
 // Random Tracks
-origin 0x0B4B6C
-base 0x800B3F6C
+origin 0x0B4B64
+base 0x800B3F64
+nop
+nop
 j RandomTracks
 
 // Scaling Fix
