@@ -464,37 +464,36 @@ scope ScalingFix3p: { // Available registers: t9, at
 }
 
 // Widescreen
-Widescreen:
-lui t0, 0x800E
-lw t0, 0xC538 (t0) // Check players
-addiu t1, r0, 0x02
-beq t0, t1, Widescreen2p
-nop
-Widescreen1p:
-  GetSetting(t0, 3)
-  addiu t1, r0, 0x02
-  beq t0, t1, Widescreen1pEnabled
-  nop
-  li a3, 0x3FAAAAAB // Return 3FAAAAAB
-  b WidescreenEnd
-  nop
-  Widescreen1pEnabled:
-    li a3, 0x3FDFAAAB // Return 3FDFAAAB
-    b WidescreenEnd
+scope Widescreen: {
+  LuiLb(t0, Options+3)
+  Disabled:
+    OriBne(t0, 0x01, t1, Enabled) // If option disabled
+    LuiLw(t0, 0x800DC538) // Determine the player count
+    Disabled1p:
+      OriBne(t0, 0x01, t1, Disabled2p) // If players == 2
+      li a3, 0x3FAAAAAB // Return 3FAAAAAB
+      b End
+      nop
+    Disabled2p:
+      li a3, 0x402AAAAB // Else return 402AAAAB
+      b End
+      nop
+  Enabled:
+    OriBne(t0, 0x02, t1, End) // If option enabled
+    LuiLw(t0, 0x800DC538) // Determine the player count
+    Enabled1p:
+      OriBne(t0, 0x01, t1, Enabled2p) // If players == 2
+      li a3, 0x3FDFAAAB // Return 3FDFAAAB
+      b End
+      nop
+    Enabled2p:
+      li a3, 0x4060AAAB // Else return 4060AAAB
+      b End
+      nop
+  End:
+    jr ra
     nop
-Widescreen2p:
-  GetSetting(t0, 3)
-  addiu t1, r0, 0x02
-  beq t0, t1, Widescreen2pEnabled
-  nop
-  li a3, 0x402AAAAB // Return 402AAAAB
-  b WidescreenEnd
-  nop
-  Widescreen2pEnabled:
-    li a3, 0x4060AAAB // Return 4060AAAB
-WidescreenEnd:
-  jr ra
-  nop
+}
 
 // Skip Trophy Ceremony
 SkipTrophy:
