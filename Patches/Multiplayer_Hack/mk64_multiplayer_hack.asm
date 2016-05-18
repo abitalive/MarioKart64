@@ -3,12 +3,7 @@ endian msb
 //output "", create
 
 include "..\LIB\N64.inc"
-
-constant DmaCopy(0x80001158)
-constant ResourceDisplay1(0x80003B04)
-constant LoadDebugFont(0x80057710)
-constant DebugPrintStringCoord(0x800577A4)
-constant Random(0x802B7E34)
+include "..\LIB\functions.inc"
 
 origin 0x0
 insert "..\LIB\Mario Kart 64 (U) [!].z64"
