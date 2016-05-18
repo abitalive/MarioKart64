@@ -1,5 +1,9 @@
 // Common macros
 
+macro Asciiz(string) {
+  db {string}, 0x00
+}
+
 macro LuiLb(reg, addr) {
    if (({addr} & 0x8000) > 0) {
       lui {reg}, (1 + ({addr} >> 16))

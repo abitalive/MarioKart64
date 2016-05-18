@@ -9,10 +9,6 @@ include "..\LIB\macros.inc"
 origin 0x0
 insert "..\LIB\Mario Kart 64 (U) [!].z64"
 
-macro asciiz(string) {
-  db {string}, 0x00
-}
-
 macro GetSetting(reg, setting) {
   lui {reg}, 0x8050
   lb {reg}, {setting} ({reg})
@@ -112,106 +108,106 @@ dd MenuEntry12Setting1, MenuEntry12Setting2, 0x00000000
 dd 0x00000000, 0x00000000
 
 MenuEntry1:
-asciiz("tracks")
+Asciiz("tracks")
 MenuEntry1Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry1Setting2:
-asciiz("random")
+Asciiz("random")
 
 MenuEntry2:
-asciiz("scaling")
+Asciiz("scaling")
 MenuEntry2Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry2Setting2:
-asciiz("30 fps")
+Asciiz("30 fps")
 MenuEntry2Setting3:
-asciiz("60 fps")
+Asciiz("60 fps")
 
 MenuEntry3:
-asciiz("widescreen")
+Asciiz("widescreen")
 MenuEntry3Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry3Setting2:
-asciiz("enabled")
+Asciiz("enabled")
 
 MenuEntry4:
-asciiz("trophies")
+Asciiz("trophies")
 MenuEntry4Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry4Setting2:
-asciiz("skip")
+Asciiz("skip")
 
 MenuEntry5:
-asciiz("mp music")
+Asciiz("mp music")
 MenuEntry5Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry5Setting2:
-asciiz("enabled")
+Asciiz("enabled")
 
 MenuEntry6:
-asciiz("mp train")
+Asciiz("mp train")
 MenuEntry6Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry6Setting2:
-asciiz("full")
+Asciiz("full")
 
 MenuEntry7:
-asciiz("mp boat")
+Asciiz("mp boat")
 MenuEntry7Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry7Setting2:
-asciiz("enabled")
+Asciiz("enabled")
 
 MenuEntry8:
-asciiz("vs tracks")
+Asciiz("vs tracks")
 MenuEntry8Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry8Setting2:
-asciiz("all cups")
+Asciiz("all cups")
 
 MenuEntry9:
-asciiz("vs timer")
+Asciiz("vs timer")
 MenuEntry9Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry9Setting2:
-asciiz("enabled")
+Asciiz("enabled")
 
 MenuEntry10:
-asciiz("gold shroom")
+Asciiz("gold shroom")
 MenuEntry10Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry10Setting2:
-asciiz("feather small")
+Asciiz("feather small")
 MenuEntry10Setting3:
-asciiz("feather big")
+Asciiz("feather big")
 
 MenuEntry11:
-asciiz("items")
+Asciiz("items")
 MenuEntry11Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry11Setting2:
-asciiz("player 1")
+Asciiz("player 1")
 MenuEntry11Setting3:
-asciiz("player 2")
+Asciiz("player 2")
 MenuEntry11Setting4:
-asciiz("player 3")
+Asciiz("player 3")
 MenuEntry11Setting5:
-asciiz("player 4")
+Asciiz("player 4")
 MenuEntry11Setting6:
-asciiz("player 5")
+Asciiz("player 5")
 MenuEntry11Setting7:
-asciiz("player 6")
+Asciiz("player 6")
 MenuEntry11Setting8:
-asciiz("player 7")
+Asciiz("player 7")
 MenuEntry11Setting9:
-asciiz("player 8")
+Asciiz("player 8")
 
 MenuEntry12:
-asciiz("stats")
+Asciiz("stats")
 MenuEntry12Setting1:
-asciiz("default")
+Asciiz("default")
 MenuEntry12Setting2:
-asciiz("all yoshi")
+Asciiz("all yoshi")
 
 fill 0x800040C0 - pc() // Zero fill remainder of resource display function
 
