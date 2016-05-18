@@ -4,6 +4,7 @@ endian msb
 
 include "..\LIB\N64.inc"
 include "..\LIB\functions.inc"
+include "..\LIB\macros.inc"
 
 origin 0x0
 insert "..\LIB\Mario Kart 64 (U) [!].z64"
