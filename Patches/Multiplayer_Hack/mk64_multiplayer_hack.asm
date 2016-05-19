@@ -525,35 +525,35 @@ scope SkipTrophy: {
 }
 
 // Multiplayer Music
-MultiplayerMusic:
-GetSetting(t0, 5)
-addiu t1, r0, 0x02
-beq t0, t1, MultiplayerMusicEnabled
-nop
-lui t6, 0x800E
-lw t6, 0xC530 (t6)
-b MultiplayerMusicEnd
-nop
-MultiplayerMusicEnabled:
-  addiu t6, r0, 0x01
-MultiplayerMusicEnd:
-  j 0x8028ECA0
-  nop
+scope MultiplayerMusic: {
+  LuiLb(t0, Options+5)
+  Disabled:
+    OriBne(t0, 0x01, t1, Enabled) // If option disabled
+    LuiLw(t6, 0x800DC530) // Original instructions
+    b End
+    nop
+  Enabled:
+    OriBne(t0, 0x02, t1, End) // If option enabled
+    ori t6, r0, 0x01 // Return 1 player
+  End:
+    j 0x8028ECA0
+    nop
+}
 
-MultiplayerMusicL:
-GetSetting(t2, 5)
-addiu t1, r0, 0x02
-beq t2, t1, MultiplayerMusicLEnabled
-nop
-lui t1, 0x800E
-lw t1, 0xC52C (t1)
-b MultiplayerMusicLEnd
-nop
-MultiplayerMusicLEnabled:
-  addiu t1, r0, 0x01
-MultiplayerMusicLEnd:
-  j 0x8028F9C8
-  nop
+scope MultiplayerMusicL: { // Available registers: t0, at
+  LuiLb(t0, Options+5)
+  Disabled:
+    OriBne(t0, 0x01, at, Enabled) // If option disabled
+    LuiLw(t1, 0x800DC52C) // Original instructions
+    b End
+    nop
+  Enabled:
+    OriBne(t0, 0x02, at, End) // If option enabled
+    ori t1, r0, 0x01 // Return 1 player
+  End:
+    jr ra
+    nop
+}
 
 // Multiplayer KD Train
 MultiplayerTrain:
@@ -827,7 +827,7 @@ nop
 
 origin 0x0F8FD0
 base 0x8028F9C0
-j MultiplayerMusicL
+jal MultiplayerMusicL
 nop
 
 // Multiplayer KD Train
