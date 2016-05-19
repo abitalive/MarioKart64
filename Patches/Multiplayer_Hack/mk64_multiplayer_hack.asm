@@ -374,6 +374,19 @@ MenuEnd:
   jr ra
   addiu sp, 0x18
 
+// Same Character
+scope SameCharacter: {
+  sb s0, 0 (t9) // Store menu position
+  beq v0, r0, End
+  nop
+  li a0, 0x49008000 // Volume
+  jal 0x800C8E10 // Play sound
+  nop
+  End:
+    j 0x800B3A50
+    nop
+}
+
 // Random Tracks
 scope RandomTracks: {
   LuiLb(t0, Options+1)
@@ -510,17 +523,6 @@ scope SkipTrophy: {
     j 0x8028E3DC
     nop
 }
-
-// Same Character
-SameCharacter:
-lui a0, 0x4900
-beq v0, r0, SameCharacterEnd
-sb s0, 0 (t9)
-jal 0x800C8E10 // Play sound
-ori a0, 0x8000 // Volume
-SameCharacterEnd:
-  j 0x800B3A50
-  nop
 
 // Multiplayer Music
 MultiplayerMusic:
@@ -725,6 +727,19 @@ include "stats_yoshi.asm"
 
 fill 0xC00000 - origin() // Zero fill remainder of ROM
 
+// Same Character
+origin 0x0B4524
+base 0x800B3924
+nop
+
+origin 0x0B45A4
+base 0x800B39A4
+nop
+
+origin 0x0B4638
+base 0x800B3A38
+j SameCharacter
+
 // Random Tracks
 origin 0x0B4B64
 base 0x800B3F64
@@ -803,19 +818,6 @@ nop
 origin 0x0F79E4
 base 0x8028E3D4
 j SkipTrophy
-
-// Same Character
-origin 0x0B4524
-base 0x800B3924
-nop
-
-origin 0x0B45A4
-base 0x800B39A4
-nop
-
-origin 0x0B4638
-base 0x800B3A38
-j SameCharacter
 
 // Multiplayer Music
 origin 0x0F82A8
