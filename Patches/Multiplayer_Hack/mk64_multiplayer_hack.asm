@@ -483,24 +483,24 @@ scope Widescreen: {
     OriBne(t0, 0x01, t1, Enabled) // If option disabled
     LuiLw(t0, 0x800DC538) // Determine the player count
     Disabled1p:
-      OriBne(t0, 0x01, t1, Disabled2p) // If players == 2
-      li a3, 0x3FAAAAAB // Return 3FAAAAAB
+      OriBne(t0, 0x02, t1, Disabled2p) // If players == 2
+      li a3, 0x402AAAAB // Return 402AAAAB
       b End
       nop
     Disabled2p:
-      li a3, 0x402AAAAB // Else return 402AAAAB
+      li a3, 0x3FAAAAAB // Else return 3FAAAAAB
       b End
       nop
   Enabled:
     OriBne(t0, 0x02, t1, End) // If option enabled
     LuiLw(t0, 0x800DC538) // Determine the player count
     Enabled1p:
-      OriBne(t0, 0x01, t1, Enabled2p) // If players == 2
-      li a3, 0x3FDFAAAB // Return 3FDFAAAB
+      OriBne(t0, 0x02, t1, Enabled2p) // If players == 2
+      li a3, 0x4060AAAB // Return 4060AAAB
       b End
       nop
     Enabled2p:
-      li a3, 0x4060AAAB // Else return 4060AAAB
+      li a3, 0x3FDFAAAB // Else return 3FDFAAAB
       b End
       nop
   End:
