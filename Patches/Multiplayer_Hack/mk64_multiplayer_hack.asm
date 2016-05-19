@@ -496,19 +496,20 @@ scope Widescreen: {
 }
 
 // Skip Trophy Ceremony
-SkipTrophy:
-GetSetting(t0, 4)
-addiu t1, r0, 0x02
-beq t0, t1, SkipTrophyEnabled
-nop
-addiu t7, r0, 0x05
-b SkipTrophyEnd
-nop
-SkipTrophyEnabled:
-  addiu t7, r0, 0x01
-SkipTrophyEnd:
-  j 0x8028E3DC
-  nop
+scope SkipTrophy: {
+  LuiLb(t0, Options+4)
+  Disabled:
+    OriBne(t0, 0x01, t1, Enabled) // If option disabled
+    addiu t7, r0, 0x05 // Original instruction
+    b End
+    nop
+  Enabled:
+    OriBne(t0, 0x02, t1, End) // If option enabled
+    ori t7, r0, 0x01 // Skip to main menu
+  End:
+    j 0x8028E3DC
+    nop
+}
 
 // Same Character
 SameCharacter:
