@@ -556,20 +556,20 @@ scope MultiplayerMusicL: { // Available registers: t0, at
 }
 
 // Multiplayer KD Train
-MultiplayerTrain:
-GetSetting(t0, 6)
-addiu t1, r0, 0x02
-beq t0, t1, MultiplayerTrainEnabled
-nop
-lui v0, 0x800E
-lw v0, 0xC530 (v0)
-b MultiplayerTrainEnd
-nop
-MultiplayerTrainEnabled:
-  addu v0, r0, r0
-MultiplayerTrainEnd:
-  j 0x80012954
-  nop
+scope MultiplayerTrain: { // Available registers: t5, a2
+  LuiLb(t5, Options+6)
+  Disabled:
+    OriBne(t5, 0x01, a2, Enabled) // If option disabled
+    LuiLw(v0, 0x800DC530) // Original instructions
+    b End
+    nop
+  Enabled:
+    OriBne(t5, 0x02, a2, End) // If option enabled
+    ori v0, r0, r0 // Return 1 player
+  End:
+    jr ra
+    nop
+}
 
 // Multiplayer DKJP Boat
 MultiplayerBoat:
@@ -833,7 +833,7 @@ nop
 // Multiplayer KD Train
 origin 0x01354C
 base 0x8001294C
-j MultiplayerTrain
+jal MultiplayerTrain
 nop
 
 // Multiplayer DKJP Boat
