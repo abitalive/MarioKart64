@@ -10,6 +10,9 @@ origin 0x0
 insert "..\LIB\Mario Kart 64 (U) [!].z64"
 
 constant ModeSelection(0x800DC53C)
+constant CourseSelection1(0x800DC5A0)
+constant CupSelection(0x8018EE09)
+constant CourseSelection2(0x8018EE0B)
 constant Options(0x80500000)
 
 macro GetSetting(reg, setting) {
@@ -588,52 +591,40 @@ scope MultiplayerBoat: { // Available registers: at, a0
 }
 
 // Versus All Cups
-VsAllCups:
-addiu sp, -0x18
-sw ra, 0x14 (sp)
-jal 0x80290388
-nop
-GetSetting(a0, 8)
-addiu at, r0, 0x02
-bne a0, at, VsAllCupsEnd
-nop
-VsAllCupsMode:
-  lui t0, 0x800E
-  lw t0, 0xC53C (t0)
-  addiu t1, r0, 0x02 // Versus
-  bne t0, t1, VsAllCupsEnd
+scope VersusAllCups: { // Available registers: all
+  addiu sp, -0x18
+  sw ra, 0x14 (sp)
+  jal 0x80290388 // Original instruction
   nop
-VsAllCupsRr: // Set cup and track to zero if track = RR
-  lui t0, 0x8019
-  lb t1, 0xEE09 (t0) // Load cup
-  lb t2, 0xEE0B (t0) // Load track
-  lui t3, 0x800E
-  lb t3, 0xC5A1 (t3)
-  addiu t4, r0, 0x0D
-  bne t1, t4, VsAllCupsRrEnd // Check track
-  nop
-  sb r0, 0xEE09 (t0)
-  sb r0, 0xEE0B (t0)
-  b VsAllCupsEnd
-  nop
-  VsAllCupsRrEnd:
-VsAllCupsCup: // Increment cup if track = 3
-  addiu t3, r0, 0x03
-  bne t2, t3, VsAllCupsCupEnd // Check track
-  nop
-  addiu t1, 0x01
-  sb t1, 0xEE09 (t0)
-  sb r0, 0xEE0B (t0)
-  b VsAllCupsEnd
-  nop
-  VsAllCupsCupEnd:
-VsAllCupsTrack: // Otherwise increment track
-  addiu t2, 0x01
-  sb t2, 0xEE0B (t0)
-VsAllCupsEnd:
-  lw ra, 0x14 (sp)
-  jr ra
-  addiu sp, 0x18
+  LuiLb(t0, Options+8)
+  OriBne(t0, 0x02, t1, End) // Skip if option disabled
+  LuiLw(t0, ModeSelection)
+  OriBne(t0, 0x02, t1, End) // Skip if mode != Versus
+  RainbowRoad:
+    LuiLh(t0, CourseSelection1)
+    OriBne(t0, 0x0D, t1, IncrementCup) // If course == Rainbow Road
+    LuiSb(r0, CupSelection, t0) // Reset cup
+    LuiSb(r0, CourseSelection2, t0) // Reset course
+    b End
+    nop
+  IncrementCup:
+    LuiLb(t0, CourseSelection2)
+    OriBne(t0, 0x03, t1, IncrementCourse) // Else if course == 3
+    LuiLb(t0, CupSelection)
+    addiu t0, 0x01 // Increment cup
+    LuiSb(t0, CupSelection, t1)
+    LuiSb(r0, CourseSelection2, t0) // Reset course
+    b End
+    nop
+  IncrementCourse:
+    LuiLb(t0, CourseSelection2)
+    addiu t0, 0x01 // Else increment course
+    LuiSb(t0, CourseSelection2, t1)
+  End:
+    lw ra, 0x14 (sp)
+    jr ra
+    addiu sp, 0x18
+}
 
 // Versus Timer
 VsTimer:
@@ -845,7 +836,7 @@ j MultiplayerBoat
 // Versus All Cups
 origin 0x09DBA4
 base 0x8009CFA4
-jal VsAllCups
+jal VersusAllCups
 nop
 
 // Versus Timer
