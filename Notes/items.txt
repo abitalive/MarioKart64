@@ -1,0 +1,15 @@
+01 Banana
+02 Banana Bunch
+03 Green Shell
+04 Triple Green Shell
+05 Red Shell
+06 Triple Red Shell
+07 Spiny Shell
+08 Thunder Bolt
+09 Fake Item Box
+0A Super Star
+0B Boo
+0C Mushroom
+0D Double Mushroom
+0E Triple Mushrooms
+0F Super Mushroom
