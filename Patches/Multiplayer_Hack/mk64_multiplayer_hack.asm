@@ -572,19 +572,20 @@ scope MultiplayerTrain: { // Available registers: t5, a2
 }
 
 // Multiplayer DKJP Boat
-MultiplayerBoat:
-GetSetting(a0, 7)
-addiu at, r0, 0x02
-beq a0, at, MultiplayerBoatEnabled
-nop
-slti at, t7, 0x03
-b MultiplayerBoatEnd
-nop
-MultiplayerBoatEnabled:
-  addiu at, r0, 0x01
-MultiplayerBoatEnd:
-  j 0x80013360
-  nop
+scope MultiplayerBoat: { // Available registers: at, a0
+  LuiLb(at, Options+7)
+  Disabled:
+    OriBne(at, 0x01, a0, Enabled) // If option disabled
+    lb t7, 0 (t2) // Original instruction
+    b End
+    nop
+  Enabled:
+    OriBne(at, 0x02, a0, End) // Else if option enabled
+    ori t7, r0, 0x01 // Return 1 player
+  End:
+    j 0x80013354
+    nop
+}
 
 // Versus All Cups
 VsAllCups:
@@ -837,8 +838,8 @@ jal MultiplayerTrain
 nop
 
 // Multiplayer DKJP Boat
-origin 0x013F58
-base 0x80013358
+origin 0x013F4C
+base 0x8001334C
 j MultiplayerBoat
 
 // Versus All Cups
