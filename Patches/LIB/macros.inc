@@ -4,6 +4,30 @@ macro Asciiz(string) {
   db {string}, 0x00
 }
 
+macro LaBeq(reg1, i, reg2, label) {
+  la {reg2}, {i}
+  beq {reg1}, {reg2}, {label}
+  nop
+}
+
+macro LaBne(reg1, i, reg2, label) {
+  la {reg2}, {i}
+  bne {reg1}, {reg2}, {label}
+  nop
+}
+
+macro LiBeq(reg1, i, reg2, label) {
+  li {reg2}, {i}
+  beq {reg1}, {reg2}, {label}
+  nop
+}
+
+macro LiBne(reg1, i, reg2, label) {
+  li {reg2}, {i}
+  bne {reg1}, {reg2}, {label}
+  nop
+}
+
 macro LuiLb(reg, addr) {
    if (({addr} & 0x8000) > 0) {
       lui {reg}, (1 + ({addr} >> 16))
