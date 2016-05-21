@@ -624,19 +624,27 @@ scope VersusAllCups: { // Available registers: all
 }
 
 // Versus Timer
-VsTimer:
-GetSetting(t0, 9)
-addiu t1, r0, 0x02
-beq t0, t1, VsTimerEnabled
-nop
-addiu at, r0, 0x02
-b VsTimerEnd
-nop
-VsTimerEnabled:
-  addu at, r0, r0
-VsTimerEnd:
-  j 0x8004FA8C
-  nop
+scope VersusTimer: { // Available registers: all
+  LuiLb(t0, Options+9)
+  Disabled:
+    OriBne(t0, 0x01, t1, Enabled) // If option disabled
+    LuiLw(v0, ModeSelection) // Original instructions
+    b End
+    nop
+  Enabled:
+    OriBne(t0, 0x02, t1, End) // Else if option enabled
+    LuiLw(t0, ModeSelection)
+    OriBne(t0, 0x02, t1, Current) // If mode == Versus
+    Versus:
+      ori v0, r0, r0 // Return GP mode
+      b End
+      nop
+    Current:
+      LuiLw(v0, ModeSelection) // Else return current mode
+  End:
+    j 0x8004FA84
+    nop
+}
 
 // Gold Mushroom
 GoldMushroom:
@@ -837,9 +845,10 @@ jal VersusAllCups
 nop
 
 // Versus Timer
-origin 0x050684
-base 0x8004FA84
-j VsTimer
+origin 0x05067C
+base 0x8004FA7C
+j VersusTimer
+nop
 
 // Gold Mushroom
 origin 0x11C680
