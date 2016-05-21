@@ -393,7 +393,7 @@ scope SameCharacter: {
 // Random Tracks
 scope RandomTracks: {
   LuiLb(t0, Options+1)
-  OriBne(t0, 0x02, t1, End) // Skip if option disabled
+  OriBeq(t0, 0x01, t1, End) // Skip if option disabled
   LuiLw(t0, ModeSelection) // Determine the current mode
   Versus:
     OriBne(t0, 0x02, t1, Battle) // If mode == Versus
@@ -594,7 +594,7 @@ scope VersusAllCups: { // Available registers: all
   jal 0x80290388 // Original instruction
   nop
   LuiLb(t0, Options+8)
-  OriBne(t0, 0x02, t1, End) // Skip if option disabled
+  OriBeq(t0, 0x01, t1, End) // Skip if option disabled
   LuiLw(t0, ModeSelection)
   OriBne(t0, 0x02, t1, End) // Skip if mode != Versus
   RainbowRoad:
