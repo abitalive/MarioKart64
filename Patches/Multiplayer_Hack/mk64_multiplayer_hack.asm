@@ -15,11 +15,6 @@ constant CupSelection(0x8018EE09)
 constant CourseSelection2(0x8018EE0B)
 constant Options(0x80500000)
 
-macro GetSetting(reg, setting) {
-  lui {reg}, 0x8050
-  lb {reg}, {setting} ({reg})
-}
-
 // DMA
 origin 0x0029F0
 base 0x80001DF0 // Disable resource display function
