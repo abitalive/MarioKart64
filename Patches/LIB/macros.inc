@@ -93,3 +93,15 @@ macro OriBne(reg1, i, reg2, label) {
   bne {reg1}, {reg2}, {label}
   nop
 }
+
+macro SltiBeq(reg1, i, reg2, label) {
+  slti {reg2}, {reg1}, {i}
+  beq {reg2}, r0, {label}
+  nop
+}
+
+macro SltiBnez(reg1, i, reg2, label) {
+  slti {reg2}, {reg1}, {i}
+  bnez {reg2}, {label}
+  nop
+}
