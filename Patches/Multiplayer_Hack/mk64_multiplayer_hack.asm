@@ -647,27 +647,28 @@ scope VersusTimer: { // Available registers: all
 }
 
 // Gold Mushroom
-GoldMushroom:
-GetSetting(t0, 10)
-addiu t1, r0, 0x02
-beq t0, t1, GoldMushroomSmall
-nop
-addiu t1, r0, 0x03
-beq t0, t1, GoldMushroomBig
-nop
-ori t8, t7, 0x0200
-b GoldMushroomEnd
-nop
-GoldMushroomSmall:
-  ori t8, t7, 0x1000
-  b GoldMushroomEnd
-  nop
-GoldMushroomBig:
-  lui t0, 0x02
-  or t8, t8, t0
-GoldMushroomEnd:
-  j 0x802B30D4
-  sw t8, 0x000C (a0)
+// Available registers: all except t7
+// Returns: t8
+scope GoldMushroom: {
+  LuiLb(t0, Options+10)
+  Disabled:
+    OriBne(t0, 0x01, t1, FeatherSmall) // If option disabled
+    ori t8, t7, 0x0200 // Original instruction
+    b End
+    nop
+  FeatherSmall:
+    OriBne(t0, 0x02, t1, FeatherBig) // Else if option set to feather small
+    ori t8, t7, 0x1000 // Activate small feather jump state
+    b End
+    nop
+  FeatherBig:
+    OriBne(t0, 0x03, t1, End) // Else if option set to feather big
+    lui t0, 0x02
+    or t8, t0 // Activate large feather jump state
+  End:
+    j 0x802B30D4
+    sw t8, 0x000C (a0) // Store new state
+}
 
 // Items
 Items:
@@ -853,9 +854,9 @@ nop
 // Gold Mushroom
 origin 0x11C680
 base 0x802B3070
+nop
+nop
 j GoldMushroom
-nop
-nop
 
 // Items
 origin 0x07BB60
