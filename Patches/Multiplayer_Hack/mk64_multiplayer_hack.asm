@@ -15,40 +15,45 @@ constant CupSelection(0x8018EE09)
 constant CourseSelection2(0x8018EE0B)
 constant Options(0x80500000)
 
-// DMA
+// Init
 origin 0x0029F0
-base 0x80001DF0 // Disable resource display function
-nop
+base 0x80001DF0
+nop // Disable resource display function
 
 origin 0x001E6C
 base 0x8000126C
 jal ResourceDisplay1
 nop
 
-origin 0x004704 // Replaces resource display function
+// Runs once at boot
+// Available registers: all
+// Replaces resource display function
+origin 0x004704
 base ResourceDisplay1
-addiu sp, -0x18
-sw ra, 0x14 (sp)
-jal 0x800010CC
-nop
-la a0, 0x80400000 // RAM destination (0x80400000)
-li a1, 0xBE9170 // ROM source (0xBE9170)
-li a2, 0x16E90 // Size (0x16E90)
-jal DmaCopy
-nop
-
-// Menu Init
-lui t0, 0x8050
-addiu t1, t0, 0x10
-la t2, 0x01010101
-MenuInitLoop:
-  sw t2, 0 (t0)
-  addiu t0, 0x04
-  bne t0, t1, MenuInitLoop
+scope Init: {
+  addiu sp, -0x18
+  sw ra, 0x14 (sp)
+  jal 0x800010CC // Original instruction
   nop
-lw ra, 0x14 (sp)
-jr ra
-addiu sp, 0x18
+  DMA:
+    la a0, 0x80400000 // RAM destination
+    li a1, 0xBE9170 // ROM source
+    li a2, 0x16E90 // Size
+    jal DmaCopy // DMA copy end of ROM to Expansion Pak area
+    nop
+  Menu:
+    la t0, Options
+    addiu t1, t0, 0x10 // 15 menu options
+    li t2, 0x01010101
+    Loop:
+      sw t2, 0 (t0) // Initialize cursor and options with 0x01
+      addiu t0, 0x04
+      bne t0, t1, Loop
+      nop
+  lw ra, 0x14 (sp)
+  jr ra
+  addiu sp, 0x18
+}
 
 // Menu Strings
 //
