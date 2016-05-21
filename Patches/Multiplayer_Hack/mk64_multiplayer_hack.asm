@@ -411,7 +411,7 @@ scope RandomTracks: {
     OriBne(v0, 0x12, t1, Store) // Store the result if != 0x12 (DKJP)
     ori v0, r0, 0x0F // Swap 0x12 (DKJP) with 0x0F (BF)
   Store:
-    LuiSh(v0, 0x800DC5A0, t0)
+    LuiSh(v0, CourseSelection1, t0)
   End:
     lw ra, 0x14 (sp)
     jr ra
