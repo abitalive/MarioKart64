@@ -26,6 +26,11 @@ constant DebugPrintStringCoord(0x800577A4)
 // a1 = Y coordinate
 // a2 = Pointer to String
 
+constant BCopy(0x800D3520)
+// a0 = Source
+// a1 = Destination
+// a2 = Size
+
 constant Random(0x802B7E34)
 // a0 = Range
 // v0 = Random number
