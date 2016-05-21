@@ -382,8 +382,8 @@ scope SameCharacter: {
   sb s0, 0 (t9) // Store menu position
   beq v0, r0, End
   nop
-  li a0, 0x49008000 // Volume
-  jal 0x800C8E10 // Play sound
+  li a0, 0x49008000 // Selection scroll
+  jal PlaySound2 // Play sound
   nop
   End:
     j 0x800B3A50

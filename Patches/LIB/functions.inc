@@ -26,6 +26,9 @@ constant DebugPrintStringCoord(0x800577A4)
 // a1 = Y coordinate
 // a2 = Pointer to String
 
+constant PlaySound2(0x800C8E10)
+// a0 = Sound
+
 constant BCopy(0x800D3520)
 // a0 = Source
 // a1 = Destination
