@@ -691,40 +691,40 @@ scope PlayerItems: {
 }
 
 // Character Stats
+// Runs once before a race
+// Available registers: all
 scope CharacterStats: {
   addiu sp, -0x18
   sw ra, 0x14 (sp)
-  jal 0x800010CC
+  jal 0x800010CC // Original instruction
   nop
-  GetSetting(t0, 12)
-  ori t1, r0, 0x0001
-  bne t0, t1, Enabled
-  nop
-  Disabled: // If 0x80500000 != 0x00 DMA default stats
+  LuiLb(t0, Options+12)
+  Disabled:
+    OriBne(t0, 0x01, t1, Yoshi) // If option disabled
     la a0, 0x800E2360 // Destination
     li a1, 0x0E2F60 // Source
     li a2, 0x14B0 // Size
-    jal DmaCopy
+    jal DmaCopy // DMA copy default stats
     nop
     b End
     nop
-  Enabled: // Else DMA new stats
-    la a0, 0x800E2360 // Destination
-    li a1, StatsMain // Source
+  Yoshi:
+    OriBne(t0, 0x02, t1, End) // Else if option set to all Yoshi
+    li a0, YoshiMain // Source
+    la a1, 0x800E2360 // Destination
     li a2, 0x14B0 // Size
-    jal DmaCopy
+    jal BCopy // Copy Yoshi main stats
     nop
-    la a0, 0x802B8790 // Destination
-    li a1, StatsWeight // Source
+    li a0, YoshiWeight // Source
+    la a1, 0x802B8790 // Destination
     li a2, 0x20 // Size
-    jal DmaCopy
+    jal BCopy // Copy Yoshi weight stats
     nop
   End:
     lw ra, 0x14 (sp)
     jr ra
     addiu sp, 0x18
 }
-
 
 // Character Stats
 include "stats_yoshi.asm"

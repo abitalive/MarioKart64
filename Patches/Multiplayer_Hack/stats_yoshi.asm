@@ -1,6 +1,6 @@
 // N64 "Mario Kart 64" Stats by krom (Peter Lemon) modified by Drew Weatherton:
 
-constant StatsMain(origin())
+YoshiMain:
 KartUnknown01:
               // ROM       RAM         Kart *Unknown*
 float32 -10.0 // $000E2F60 $800E2360 - Mario  (IEEE32) (-10.0: $C1200000)
@@ -1660,7 +1660,7 @@ float32 0.002 // $000E4408 $800E3808 - Peach  (IEEE32) (0.002: $3B03126F)
 float32 0.002 // $000E440C $800E380C - Bowser (IEEE32) (0.002: $3B03126F)
 
 
-constant StatsWeight(origin())
+YoshiWeight:
             // ROM       RAM         Kart Weight
 float32 0.9 // $00121DA0 $802B8790 - Mario  (IEEE32) (1.2: $3F99999A)
 float32 0.9 // $00121DA4 $802B8794 - Luigi  (IEEE32) (1.0: $3F800000)
