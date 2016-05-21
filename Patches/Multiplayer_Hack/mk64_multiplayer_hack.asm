@@ -670,19 +670,25 @@ scope GoldMushroom: {
     sw t8, 0x000C (a0) // Store new state
 }
 
-// Items
-Items:
-GetSetting(t0, 11)
-ori t1, r0, 0x0001
-bne t0, t1, ItemsEnabled // If items option disabled
-nop
-b ItemsEnd // Skip
-nop
-ItemsEnabled: // Else set player value to option value - 2
-addiu a0, t0, -0x02
-ItemsEnd:
-j 0x8007ADA8
-nop
+// Player Items
+// Runs once when players receive an item
+// Available registers: all
+// Returns: a0
+scope PlayerItems: {
+  addiu sp, -0x18
+  sw ra, 0x14 (sp)
+  LuiLb(t0, Options+11)
+  OriBeq(t0, 0x01, t1, End) // Skip if option disabled
+  Enabled:
+    SltiBeq(t0, 0x0A, t1, End) // If option enabled
+    addiu a0, t0, -0x02 // Set player
+  End:
+    jal 0x8007ADA8 // Original instruction
+    nop
+    lw ra, 0x14 (sp)
+    jr ra
+    addiu sp, 0x18
+}
 
 // Character Stats
 scope CharacterStats: {
@@ -861,7 +867,7 @@ j GoldMushroom
 // Items
 origin 0x07BB60
 base 0x8007AF60
-jal Items
+jal PlayerItems
 
 // Character Stats
 origin 0x003314
