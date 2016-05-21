@@ -600,8 +600,8 @@ scope VersusAllCups: { // Available registers: all
   RainbowRoad:
     LuiLh(t0, CourseSelection1)
     OriBne(t0, 0x0D, t1, IncrementCup) // If course == Rainbow Road
-    LuiSb(r0, CupSelection, t0) // Reset cup
-    LuiSb(r0, CourseSelection2, t0) // Reset course
+    LuiSb(r0, CupSelection, t1) // Reset cup
+    LuiSb(r0, CourseSelection2, t1) // Reset course
     b End
     nop
   IncrementCup:
@@ -610,7 +610,7 @@ scope VersusAllCups: { // Available registers: all
     LuiLb(t0, CupSelection)
     addiu t0, 0x01 // Increment cup
     LuiSb(t0, CupSelection, t1)
-    LuiSb(r0, CourseSelection2, t0) // Reset course
+    LuiSb(r0, CourseSelection2, t1) // Reset course
     b End
     nop
   IncrementCourse:
