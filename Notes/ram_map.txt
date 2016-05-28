@@ -9,7 +9,7 @@
 800F6920 16b Player 2 input
 800F6930 16b Player 3 input
 800F6940 16b Player 4 input
-80150148 w Aspect ratio (3FAAAAAB,402AAAAB)
+80150148 f Aspect ratio (3FAAAAAB,402AAAAB)
 801643BA h Player 1 place (00-07)
 801643BE h Player 2 place (00-07)
 801643C2 h Player 3 place (00-07)
