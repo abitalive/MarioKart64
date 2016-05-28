@@ -397,7 +397,7 @@ scope RandomTracks: {
   LuiLw(t0, ModeSelection) // Determine the current mode
   Versus:
     OriBne(t0, 0x02, t1, Battle) // If mode == Versus
-    jal Random // Call random function with range 0x00-0x10
+    jal RandomInt // Call random function with range 0x00-0x10
     ori a0, r0, 0x10
     OriBne(v0, 0x0F, t1, Store) // Store the returned value if != 0x0F (BF)
     ori v0, r0, 0x12 // Swap 0x0F (BF) with 0x12 (DKJP)
@@ -405,7 +405,7 @@ scope RandomTracks: {
     nop
   Battle:
     OriBne(t0, 0x03, t1, End) // Else if mode == Battle
-    jal Random // Call random function with range 0x00-0x03
+    jal RandomInt // Call random function with range 0x00-0x03
     ori a0, r0, 0x04
     addiu v0, 0x10 // Add 0x10 to the returned value
     OriBne(v0, 0x12, t1, Store) // Store the result if != 0x12 (DKJP)
