@@ -1,0 +1,176 @@
+// Item RNG in Mario Kart 64
+
+// Functions
+//
+// 0x8007ADA8 RandomItem
+// Returns a random item for the specified place and player type
+// a0 = Place
+// a1 = PlayerType
+//   00 = Human
+//   01 = CPU
+// v0 = RandomItemRtn
+//
+// 0x802A7BD4 GetItemTable
+// Returns pointer to item table
+// a0 = LookupOffset
+// v0 = TablePointer
+//
+// 0x802B7D94 RandomU16
+// Returns a random number between 0 and 65535
+// Used by RandomInt function
+// Same function as SM64 https://youtu.be/MiuLeTE2MeQ
+// v0 = RandomU16Rtn
+//
+// 0x802B7E34 RandomInt
+// Returns a random number between 0 and (a0 - 1)
+// a0 = Range
+// v0 = RandomIntRtn
+
+
+// Variables
+//
+// 0x800DC538 4b NumPlayers
+// Current number of players
+// 01 = 1 Player
+// 02 = 2 Players
+// 03 = 3 Players
+// 04 = 4 Players
+//
+// 0x800DC53C 4b ModeSelection
+// Current game mode
+// 00 = GP
+// 01 = Time Trial
+// 02 = Versus
+// 03 = Battle
+//
+// 0x801658FD 1b ItemRandom
+// Random number between 0 and 99
+// Used and updated when looking up item table
+//
+// 0x801658FF 1b ButtonCounter
+// Increments by 1 each frame A/B/R are held on any active controller during a race
+// Increments by more than 1 if multiple buttons are held
+// Maxes at 255 then loops back to 0
+//
+// 0x8018D3FC 4b RaceTimer
+// Increments by 1 each frame during a race
+//
+// 0x802BA290 2b RngVar
+// Random number between 0 and 65535
+// Used and updated by RandomU16 function
+
+// 0x8007ADA8 RandomItem
+addiu sp, sp, 0xffe0
+sw ra, 0x0014 (sp)
+sw a0, 0x0020 (sp) // Store Place to stack
+sw a1, 0x0024 (sp) // Store PlayerType to stack
+GetRandom: // Updates ItemRandom variable. Uses entropy from RandomIntRtn, ButtonCounter and RaceTimer
+  jal 0x802b7e34 // Call RandomInt function, returns RandomIntRtn in v0
+  addiu a0, r0, 0x0064 // Range = 0-99
+  lui a1, 0x8016
+  addiu a1, a1, 0x58fd
+  lui t7, 0x8016
+  lbu t7, 0x58ff (t7) // t7 = ButtonCounter
+  lbu t6, 0x0000 (a1) // t6 = ItemRandom
+  lui t0, 0x8019
+  lw t0, 0xd3fc (t0) // t0 = RaceTimer
+  addu t8, t6, t7 // t8 = ItemRandom + ButtonCounter
+  addu t9, v0, t8 // t9 = RandomIntRtn + ItemRandom + ButtonCounter
+  addiu at, r0, 0x0064 // at = 100
+  addu t1, t9, t0 // t1 = RandomIntRtn + ItemRandom + ButtonCounter + RaceTimer
+  divu t1, at
+  mfhi t2 // t2 = (RandomIntRtn + ItemRandom + ButtonCounter + RaceTimer) % 100
+  sb t2, 0x0000 (a1) // Store t2 to ItemRandom
+GetMode: // Gets the current game mode
+  lui v1, 0x800e
+  lw v1, 0xc53c (v1) // v1 = ModeSelection
+  addiu a0, r0, 0x0002 // a0 = 2
+  lui v0, 0x800e
+  bne a0, v1, 0x8007aeb4 // Branch taken if ModeSelection != Versus
+  addiu at, r0, 0x0003 // at = 3
+Versus: // If ModeSelection == Versus
+  CheckPlayers: // Gets the current player count
+    lw v0, 0xc538 (v0) // v0 = NumPlayers
+    addiu at, r0, 0x0003 // at = 3
+    beq v0, a0, 0x8007ae3c // Branch taken if NumPlayers == 2
+    nop
+    beq v0, at, 0x8007ae58 // Branch taken if NumPlayers == 3
+    lui a0, 0x0d01
+    addiu at, r0, 0x0004 // at = 4
+    beq v0, at, 0x8007ae70 // Branch taken if NumPlayers == 4
+    lui a0, 0x0d01
+    beq r0, r0, 0x8007ae88 // Jump to ItemLookupVersus
+    lh t3, 0x0022 (sp) // t3 = Place
+  2Players: // If Players == 2
+    lui a0, 0x0d01
+    jal 0x802a7bd4 // GetItemTable, returns TablePointer in v0
+    addiu a0, a0, 0x8790 // LookupOffset = 0x0d018790
+    lui a1, 0x8016
+    sw v0, 0x0018 (sp) // Store TablePointer to stack
+    beq r0, r0, 0x8007ae84 // Jump to ItemLookupVersus
+    addiu a1, a1, 0x58fd // a1 = Pointer to ItemRandom
+  3Players: // Else if Players == 3
+    jal 0x802a7bd4 // GetItemTable, returns TablePointer in v0
+    addiu a0, a0, 0x8858 // LookupOffset = 0x0d018858
+    lui a1, 0x8016
+    sw v0, 0x0018 (sp) // Store TablePointer to stack
+    beq r0, r0, 0x8007ae84 // Jump to ItemLookupVersus
+    addiu a1, a1, 0x58fd // a1 = Pointer to ItemRandom
+  4Players: // Else if Players == 4
+    jal 0x802a7bd4 // GetItemTable, returns TablePointer in v0
+    addiu a0, a0, 0x8984 // LookupOffset = 0x0d018984
+    lui a1, 0x8016
+    sw v0, 0x0018 (sp) // Store TablePointer to stack
+    addiu a1, a1, 0x58fd // a1 = Pointer to ItemRandom
+  ItemLookupVersus: // Returns a random item from the Versus item table in v1
+    lh t3, 0x0022 (sp) // t3 = Place
+    lw t5, 0x0018 (sp) // t5 = TablePointer
+    lbu t7, 0x0000 (a1) // t7 = ItemRandom
+    sll t4, t3, 0x2
+    subu t4, t4, t3 // t4 = Place * 3
+    sll t4, t4, 0x3 // t4 = (Place * 3) * 8
+    addu t4, t4, t3 // t4 = (Place * 3) * 8 + Place
+    sll t4, t4, 0x2 // t4 = ((Place * 3) * 8 + Place) * 4
+    addu t6, t4, t5 // t6 = ((Place * 3) * 8 + Place) * 4 + TablePointer
+    addu t8, t6, t7 // t8 = ((Place * 3) * 8 + Place) * 4 + TablePointer + ItemRandom
+    beq r0, r0, 0x8007af2c // Jump to end
+    lbu v1, 0x0000 (t8) // v1 = RandomItem
+Battle: // Else if ModeSelection == Battle
+  bne v1, at, 0x8007aedc // Branch taken if ModeSelection != Battle
+  lh t1, 0x0026 (sp) // t1 = PlayerType
+  lui a0, 0x0d01
+  jal 0x802a7bd4 // GetItemTable, returns TablePointer in v0
+  addiu a0, a0, 0x8b14 // LookupOffset = 0x0d018b14
+  lui t9, 0x8016
+  lbu t9, 0x58fd (t9) // t9 = ItemRandom
+  addu t0, t9, v0 // t0 = ItemRandom + TablePointer
+  beq r0, r0, 0x8007af2c // Jump to end
+  lbu v1, 0x0000 (t0) // v1 = RandomItem
+GP: // Else if ModeSelection == GP
+  Human: // If PlayerType == Human
+    bnez t1, 0x8007aef8 // Branch taken if PlayerType != Human
+    lui a0, 0x0d01
+    lui a0, 0x0d01
+    jal 0x802a7bd4 // GetItemTable, returns TablePointer in v0
+    addiu a0, a0, 0x8150 // LookupOffset = 0x0d018150
+    beq r0, r0, 0x8007af04 // Jump to ItemLookupGP
+    lh t2, 0x0022 (sp) // t2 = Place
+  Cpu: // Else if PlayerType == Cpu
+    jal 0x802a7bd4 // GetItemTable, returns TablePointer in v0
+    addiu a0, a0, 0x8470 // LookupOffset = 0x0d018470
+    lh t2, 0x0022 (sp) // t2 = Place
+  ItemLookupGP: // Returns a random item from the GP item table in v1
+    lui t5, 0x8016
+    lbu t5, 0x58fd (t5) // t5 = ItemRandom
+    sll t3, t2, 0x2
+    subu t3, t3, t2 // t3 = Place * 3
+    sll t3, t3, 0x3 // t3 = (Place * 3) * 8
+    addu t3, t3, t2 // t3 = (Place * 3) * 8 + Place
+    sll t3, t3, 0x2 // t3 = ((Place * 3) * 8 + Place) * 4
+    addu t4, t3, v0 // t4 = ((Place * 3) * 8 + Place) * 4 + TablePointer
+    addu t6, t4, t5 // t6 = ((Place * 3) * 8 + Place) * 4 + TablePointer + ItemRandom
+    lbu v1, 0x0000 (t6) // v1 = RandomItem
+lw ra, 0x0014 (sp)
+addiu sp, sp, 0x0020
+or v0, v1, r0 // v0 = RandomItem
+jr ra
