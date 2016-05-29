@@ -726,6 +726,28 @@ scope CharacterStats: {
     addiu sp, 0x18
 }
 
+// Lap Fix
+// Runs once when a racer crosses the finish line in the opposite direction
+// Available registers: all except t3
+// Returns: t4
+scope LapFix: {
+  addiu sp, -0x18
+  sw ra, 0x14 (sp)
+  Lap3:
+    OriBne(t3, 0x03, t0, DecrementLap) // If lap == 3
+    b End // Skip
+    nop
+  DecrementLap:
+    addiu t4, t3, -0x01 // Else decrement lap
+    sw t4, 0 (v0)
+  End:
+    jal 0x80008F38 // Original instruction
+    nop
+    lw ra, 0x14 (sp)
+    jr ra
+    addiu sp, 0x18
+}
+
 // Character Stats
 include "stats_yoshi.asm"
 
@@ -873,4 +895,11 @@ jal PlayerItems
 origin 0x003314
 base 0x80002714
 jal CharacterStats
+nop
+
+// Lap Fix
+origin 0x00A2A8
+base 0x800096A8
+nop
+jal LapFix
 nop
