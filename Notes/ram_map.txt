@@ -10,6 +10,14 @@
 800F6930 16b Player 3 input
 800F6940 16b Player 4 input
 80150148 f Aspect ratio (1.33333,2.66667)
+80164390 w Player 1 lap counter (0-4294967295)
+80164394 w Player 2 lap counter (0-4294967295)
+80164398 w Player 3 lap counter (0-4294967295)
+8016439C w Player 4 lap counter (0-4294967295)
+801643A0 w Player 5 lap counter (0-4294967295)
+801643A4 w Player 6 lap counter (0-4294967295)
+801643A8 w Player 7 lap counter (0-4294967295)
+801643AC w Player 8 lap counter (0-4294967295)
 801643BA h Player 1 place (00-07)
 801643BE h Player 2 place (00-07)
 801643C2 h Player 3 place (00-07)
