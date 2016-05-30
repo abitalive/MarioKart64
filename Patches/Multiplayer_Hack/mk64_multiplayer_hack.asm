@@ -111,6 +111,10 @@ dd 0x00000002 // Character Stats
 dd MenuEntry12
 dd MenuEntry12Setting1, MenuEntry12Setting2, 0x00000000
 
+dd 0x00000002 // Versus Scores
+dd MenuEntry13
+dd MenuEntry13Setting1, MenuEntry13Setting2, 0x00000000
+
 dd 0x00000000, 0x00000000
 
 MenuEntry1:
@@ -215,6 +219,13 @@ Asciiz("default")
 MenuEntry12Setting2:
 Asciiz("all yoshi")
 
+MenuEntry13:
+Asciiz("vs scores")
+MenuEntry13Setting1:
+Asciiz("default")
+MenuEntry13Setting2:
+Asciiz("enabled")
+
 fill 0x800040C0 - pc() // Zero fill remainder of resource display function
 
 // Menu
@@ -233,7 +244,7 @@ jal LoadDebugFont
 nop
 la t0, MenuStrings // Array start
 addiu t1, r0, 0x01 // Entry number
-addiu a1, r0, 0x5A // Y coordinate
+addiu a1, r0, 0x50 // Y coordinate
 MenuArrayLoop:
   lw t2, 0x04 (t0) // Entry character string
   beq t2, r0, MenuInput
@@ -748,6 +759,110 @@ scope LapFix: {
     addiu sp, 0x18
 }
 
+// Versus Scores
+// Runs every frame on the 3p/4p versus results screen
+// Available registers: all
+scope VersusScores: {
+  addiu sp, -0x30
+  sw ra, 0x18 (sp)
+  sw a0, 0x1C (sp)
+  sw a1, 0x20 (sp)
+  sw a2, 0x24 (sp)
+  jal 0x800A6E94 // Original instruction
+  nop
+  LuiLb(t0, Options+13)
+  OriBeq(t0, 0x01, t1, End) // Skip if option disabled
+  Enabled:
+    lw t0, 0x20 (sp)
+    lw t1, 0x24 (sp)
+    Pointer:
+      ori t2, r0, 0x03
+      mult t0, t2
+      mflo t2
+      addu t1, t1, t2
+    GetScore:
+      lbu t2, 0 (t1)
+      ori t4, r0, 0x09 // 9 points for first
+      mult t2, t4
+      mflo t2
+      addu t5, r0, t2
+      lbu t2, 0x01 (t1)
+      ori t4, r0, 0x06 // 6 points for second
+      mult t2, t4
+      mflo t2
+      addu t5, t5, t2
+      lbu t2, 0x02 (t1)
+      ori t4, r0, 0x03 // 3 points for third
+      mult t2, t4
+      mflo t2
+    PrintScore:
+      addu a0, t5, t2 // Integer
+      addiu a1, sp, 0x28 // Pointer to buffer
+      ori a2, r0, 0x08 // Buffer size = 8
+      jal IntToAscii
+      nop
+      ori a0, r0, 0x03 // Color = yellow
+      jal SetTextColor
+      nop
+      lw t0, 0x1C (sp)
+      lw t1, 0x20 (sp)
+      Players3:
+        OriBne(t0, 0x03, t2, Players4) // If players == 3
+        li a0, 0x34 // X coordinate
+        ori t2, r0, 0x4E
+        multu t1, t2
+        mflo t2
+        addu a0, a0, t2
+        li a1, 0x20 // Y coordinate
+        b Players4End
+        nop
+      Players4:
+        OriBne(t0, 0x04, t2, End) // Else if players == 4
+        li a0, 0x1A // X coordinate
+        ori t2, r0, 0x45
+        multu t1, t2
+        mflo t2
+        addu a0, a0, t2
+        li a1, 0x20 // Y coordinate
+        Players4End:
+      or a2, r0, v0 // Pointer to string
+      or a3, r0, r0 // Spacing = 0
+      li t2, 0x3F4CCCCD
+      sw t2, 0x10 (sp) // X Scale = 0.8
+      sw t2, 0x14 (sp) // Y Scale = 0.8
+      jal PrintText2Cord
+      nop
+    End:
+      lw ra, 0x18 (sp)
+      jr ra
+      addiu sp, 0x30
+}
+
+// a0 = Integer
+// a1 = Pointer to buffer
+// a2 = Buffer size
+// v0 = Pointer to first digit in buffer
+scope IntToAscii: {
+  addiu a3, r0, 0xa
+  addiu t8, a1, -0x01
+  addu  t6, a1, a2
+  addiu t6, -0x02
+  sb    r0, 0x01 (t6)
+  Loop:
+    divu  a0, a3
+    mfhi  t7
+    mflo  a0
+    addiu t7, t7, 0x30
+    beq   a0, r0, End
+    sb    t7, 0 (t6)
+    addiu t6, t6, -0x01
+    bne   t6, t8, Loop
+    nop
+  End:
+    jr ra
+    addu v0, t6, r0
+}
+
 // Character Stats
 include "stats_yoshi.asm"
 
@@ -903,3 +1018,12 @@ base 0x800096A8
 nop
 jal LapFix
 nop
+
+// Versus Scores
+origin 0xA7864
+base 0x800A6C64
+jal VersusScores
+
+origin 0x0A7938
+base 0x800A6D38
+jal VersusScores

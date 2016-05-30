@@ -23,6 +23,9 @@ Mario Kart 64 ROM hack with configuration menu
 - VS Timer: Enabled / Disabled
 - VS Track Order: Original / All Cups
 
+### VS MATCH RANKING Screen
+- Include total score by player as SUM(9*[Firsts]+6*[Seconds]+3*[Thirds])
+
 ## TODO
 ### TITLE MENU Options
 - Platform: N64* / Emulator**
@@ -57,7 +60,6 @@ Mario Kart 64 ROM hack with configuration menu
 - VS CPUs: None / 1 / 2 / 3 / 4 / 5 / 6 / 7
 
 ### VS MATCH RANKING Screen
-- Include total score by player as SUM(9*[Firsts]+6*[Seconds]+3*[Thirds]+[Fourths])
 - Add "Next Course" menu option and make it the top option
 
 ### Battle MAP SELECT Options
