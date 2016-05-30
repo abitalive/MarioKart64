@@ -33,6 +33,31 @@ constant RandomItem(0x8007ADA8)
 //   01 = CPU
 // v0 = Random item
 
+constant SetTextColor(0x800930D8)
+// a0 = Color
+//   00 = Blue
+//   01 = Green
+//   02 = Red
+//   03 = Yellow
+//   04 = Transition
+//   05 = Transition
+
+constant PrintText2 (0x80093788)
+// a0 = Pointer to X coordinate
+// a1 = Pointer to Y coordinate
+// a2 = Pointer to string
+// a3 = Spacing between letters
+// sp[10] = X scale (float)
+// sp[14] = Y scale (float)
+
+constant PrintText2Cord(0x800939FC)
+// a0 = X coordinate
+// a1 = Y coordinate
+// a2 = Pointer to string
+// a3 = Spacing between letters
+// sp[10] = X scale (float)
+// sp[14] = Y scale (float)
+
 constant PlaySound2(0x800C8E10)
 // a0 = Sound
 
