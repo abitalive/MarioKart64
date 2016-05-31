@@ -236,7 +236,7 @@ nop
 
 origin 0xBE9170
 base 0x80400000
-addiu sp, -0x18
+addiu sp, -0x30
 sw ra, 0x14 (sp)
 jal 0x800A8230
 nop
@@ -386,7 +386,7 @@ MenuInput:
 MenuEnd:
   lw ra, 0x14 (sp)
   jr ra
-  addiu sp, 0x18
+  addiu sp, 0x30
 
 // Same Character
 scope SameCharacter: {
