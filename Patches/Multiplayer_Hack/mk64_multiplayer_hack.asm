@@ -763,18 +763,18 @@ scope LapFix: {
 // Runs every frame on the 3p/4p versus results screen
 // Available registers: all
 scope VersusScores: {
-  addiu sp, -0x30
-  sw ra, 0x18 (sp)
-  sw a0, 0x1C (sp)
-  sw a1, 0x20 (sp)
-  sw a2, 0x24 (sp)
+  addiu sp, -0x28
+  sw ra, 0x1C (sp)
+  sw a0, 0 (sp)
+  sw a1, 0x04 (sp)
+  sw a2, 0x08 (sp)
   jal 0x800A6E94 // Original instruction
   nop
   LuiLb(t0, Options+13)
   OriBeq(t0, 0x01, t1, End) // Skip if option disabled
   Enabled:
-    lw t0, 0x20 (sp)
-    lw t1, 0x24 (sp)
+    lw t0, 0x04 (sp)
+    lw t1, 0x08 (sp)
     Pointer:
       ori t2, r0, 0x03
       mult t0, t2
@@ -797,15 +797,15 @@ scope VersusScores: {
       mflo t2
     PrintScore:
       addu a0, t5, t2 // Integer
-      addiu a1, sp, 0x28 // Pointer to buffer
+      addiu a1, sp, 0x20 // Pointer to buffer
       ori a2, r0, 0x08 // Buffer size = 8
       jal IntToAscii
       nop
       ori a0, r0, 0x03 // Color = yellow
       jal SetTextColor
       nop
-      lw t0, 0x1C (sp)
-      lw t1, 0x20 (sp)
+      lw t0, 0 (sp)
+      lw t1, 0x04 (sp)
       Players3:
         OriBne(t0, 0x03, t2, Players4) // If players == 3
         li a0, 0x34 // X coordinate
@@ -833,9 +833,9 @@ scope VersusScores: {
       jal PrintText2Cord
       nop
     End:
-      lw ra, 0x18 (sp)
+      lw ra, 0x1C (sp)
       jr ra
-      addiu sp, 0x30
+      addiu sp, 0x28
 }
 
 // a0 = Integer
