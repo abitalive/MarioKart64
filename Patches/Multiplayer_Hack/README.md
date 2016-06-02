@@ -24,7 +24,7 @@ Mario Kart 64 ROM hack with configuration menu
 - VS Track Order: Original / All Cups
 
 ### VS MATCH RANKING Screen
-- Include total score by player as SUM(9*[Firsts]+6*[Seconds]+3*[Thirds])
+- Include total score by player as 2/1/0 (3P) or 3/2/1/0 (4P)
 
 ## TODO
 ### TITLE MENU Options

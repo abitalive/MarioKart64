@@ -773,63 +773,58 @@ scope VersusScores: {
   LuiLb(t0, Options+13)
   OriBeq(t0, 0x01, t1, End) // Skip if option disabled
   Enabled:
-    lw t0, 0x04 (sp)
-    lw t1, 0x08 (sp)
-    Pointer:
-      ori t2, r0, 0x03
-      mult t0, t2
-      mflo t2
-      addu t1, t1, t2
-    GetScore:
-      lbu t2, 0 (t1)
-      ori t4, r0, 0x09 // 9 points for first
-      mult t2, t4
-      mflo t2
-      addu t5, r0, t2
-      lbu t2, 0x01 (t1)
-      ori t4, r0, 0x06 // 6 points for second
-      mult t2, t4
-      mflo t2
-      addu t5, t5, t2
-      lbu t2, 0x02 (t1)
-      ori t4, r0, 0x03 // 3 points for third
-      mult t2, t4
-      mflo t2
-    PrintScore:
-      addu a0, t5, t2 // Integer
-      addiu a1, sp, 0x20 // Pointer to buffer
-      ori a2, r0, 0x08 // Buffer size = 8
+    ori a0, r0, 0x03 // Color = yellow
+    jal SetTextColor
+    nop
+    lw t0, 0 (sp)
+    lw t1, 0x04 (sp)
+    lw t2, 0x08 (sp)
+    sll t3, t1, 0x1
+    addu t3, t1
+    addu t2, t2, t3
+    addiu a1, sp, 0x20 // Pointer to buffer
+    ori a2, r0, 0x08 // Buffer size = 8
+    Score3p:
+      OriBne(t0, 0x03, t3, Score4p) // If players == 3
+      lbu t3, 0 (t2)
+      sll t4, t3, 0x1 // 2 points for first
+      lbu t3, 0x01 (t2)
+      addu a0, t4, t3 // 1 point for second
       jal IntToAscii
       nop
-      ori a0, r0, 0x03 // Color = yellow
-      jal SetTextColor
+      lw t0, 0x04 (sp)
+      ori t1, r0, 0x4E
+      multu t0, t1
+      mflo t1
+      ori a0, r0, 0x34
+      addu a0, a0, t1 // X coordinate
+      b ScorePrint
       nop
-      lw t0, 0 (sp)
-      lw t1, 0x04 (sp)
-      Players3:
-        OriBne(t0, 0x03, t2, Players4) // If players == 3
-        li a0, 0x34 // X coordinate
-        ori t2, r0, 0x4E
-        multu t1, t2
-        mflo t2
-        addu a0, a0, t2
-        li a1, 0x20 // Y coordinate
-        b Players4End
-        nop
-      Players4:
-        OriBne(t0, 0x04, t2, End) // Else if players == 4
-        li a0, 0x1A // X coordinate
-        ori t2, r0, 0x45
-        multu t1, t2
-        mflo t2
-        addu a0, a0, t2
-        li a1, 0x20 // Y coordinate
-        Players4End:
+    Score4p:
+      OriBne(t0, 0x04, t3, End) // Else if players == 4
+      lbu t3, 0 (t2)
+      sll t4, t3, 0x1
+      addu t5, t4, t3 // 3 points for first
+      lbu t3, 0x01 (t2)
+      sll t4, t3, 0x1 // 2 points for second
+      addu t5, t4
+      lbu t3, 0x02 (t2)
+      addu a0, t5, t3 // 1 point for third
+      jal IntToAscii
+      nop
+      lw t0, 0x04 (sp)
+      ori t1, r0, 0x45
+      multu t0, t1
+      mflo t1
+      ori a0, r0, 0x1A
+      addu a0, a0, t1 // X coordinate
+    ScorePrint:
+      ori a1, r0, 0x20 // Y coordinate
       or a2, r0, v0 // Pointer to string
       or a3, r0, r0 // Spacing = 0
-      li t2, 0x3F4CCCCD
-      sw t2, 0x10 (sp) // X Scale = 0.8
-      sw t2, 0x14 (sp) // Y Scale = 0.8
+      li t0, 0x3F4CCCCD
+      sw t0, 0x10 (sp) // X Scale = 0.8
+      sw t0, 0x14 (sp) // Y Scale = 0.8
       jal PrintText2Cord
       nop
     End:
