@@ -50,6 +50,12 @@ scope Init: {
       addiu t0, 0x04
       bne t0, t1, Loop
       nop
+    Default:
+      la t0, Options
+      ori t1, r0, 0x02
+      sb t1, 8 (t0) // Versus Tracks
+      sb t1, 12 (t0) // Character Stats
+      sb t1, 13 (t0) // Versus Scores
   lw ra, 0x14 (sp)
   jr ra
   addiu sp, 0x18
