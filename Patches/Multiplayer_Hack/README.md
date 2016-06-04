@@ -60,7 +60,7 @@ Mario Kart 64 ROM hack with configuration menu
 - VS CPUs: None / 1 / 2 / 3 / 4 / 5 / 6 / 7
 
 ### VS MATCH RANKING Screen
-- Add "Next Course" menu option and make it the top option
+- Restore "Quit" menu option
 
 ### Battle MAP SELECT Options
 - Battle Bomb Phase: Enabled / Disabled

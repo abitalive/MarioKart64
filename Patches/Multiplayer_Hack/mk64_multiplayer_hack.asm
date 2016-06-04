@@ -864,6 +864,107 @@ scope IntToAscii: {
     addu v0, t6, r0
 }
 
+// Versus All Cups Menu
+// Runs every frame on the versus and battle results screens
+// Available registers: all
+// Returns: s2
+scope VersusAllCupsMenu: {
+  LuiLb(t0, Options+8)
+  Enabled:
+    OriBne(t0, 0x02, t1, Disabled) // If option enabled
+    LuiLw(t0, ModeSelection)
+    OriBne(t0, 0x02, t1, Disabled) // If mode == Versus
+    la s2, Strings
+    b End
+    nop
+  Disabled:
+    addiu s2, 0x775C // Else original instruction
+  End:
+    jr ra
+    nop
+
+  Strings:
+    dd 0x00000000
+    dd String1
+    dd String2
+    dd String3
+    dd String4
+  String1:
+    Asciiz("CONTINUE GAME")
+  String2:
+    Asciiz("COURSE CHANGE")
+  String3:
+    Asciiz("DRIVER CHANGE")
+  String4:
+    Asciiz("RETRY")
+}
+
+// Runs when an option is selected on the versus and battle results screens
+// Available registers: all
+scope VersusAllCupsMenu2: {
+  LuiLb(t0, Options+8)
+  Enabled:
+    OriBne(t0, 0x02, t1, Disabled) // If option enabled
+    LuiLw(t0, ModeSelection)
+    OriBne(t0, 0x02, t1, Disabled) // If mode == Versus
+    lw v1, 0x04 (v0)
+    OriBeq(v1, 0x0A, at, Option1)
+    OriBeq(v1, 0x0B, at, Option2)
+    OriBeq(v1, 0x0C, at, Option3)
+    OriBeq(v1, 0x0D, at, Option4)
+    Option1:
+      LuiLh(t0, CourseSelection1)
+      RainbowRoad:
+        OriBne(t0, 0x0D, t1, Lookup) // If course == Rainbow Road
+        ori t0, r0, 0x08 // Course = Luigi Raceway
+        LuiSh(t0, CourseSelection1, t1) // Reset course
+        LuiSb(r0, CupSelection, t1) // Reset cup
+        LuiSb(r0, CourseSelection2, t1) // Reset course
+        j 0x8009CF94 // Retry
+        nop
+      Lookup:
+        la t1, 0x800F2BB4 // Else increment course
+        Loop:
+          lh t2, 0 (t1)
+          beq t0, t2, Increment
+          nop
+          addiu t1, 0x02
+          b Loop
+          nop
+        Increment:
+          lh t1, 0x02 (t1)
+          LuiSh(t1, CourseSelection1, t0) // Increment course
+          IncrementCup:
+            LuiLb(t0, CourseSelection2)
+            OriBne(t0, 0x03, t1, IncrementCourse) // If course == 3
+            LuiLb(t0, CupSelection)
+            addiu t0, 0x01 // Increment cup
+            LuiSb(t0, CupSelection, t1)
+            LuiSb(r0, CourseSelection2, t1) // Reset course
+            j 0x8009CF94 // Retry
+            nop
+          IncrementCourse:
+            LuiLb(t0, CourseSelection2)
+            addiu t0, 0x01 // Else increment course
+            LuiSb(t0, CourseSelection2, t1)
+            j 0x8009CF94 // Retry
+            nop
+    Option2:
+      j 0x8009CFA4 // Course change
+      nop
+    Option3:
+      j 0x8009CFB4 // Driver change
+      nop
+    Option4:
+      j 0x8009CF94 // Retry
+      nop
+  Disabled:
+    lw v1, 0x04 (v0) // Else original instruction
+  End:
+    j 0x8009CF6C
+    nop
+}
+
 // Character Stats
 include "stats_yoshi.asm"
 
@@ -1028,3 +1129,12 @@ jal VersusScores
 origin 0x0A7938
 base 0x800A6D38
 jal VersusScores
+
+// Versus All Cups Menu
+origin 0x0A7220
+base 0x800A6620
+jal VersusAllCupsMenu
+
+origin 0x09DB64
+base 0x8009CF64
+j VersusAllCupsMenu2
