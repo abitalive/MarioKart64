@@ -5,6 +5,7 @@
 800DC53C w Mode selection (00-03)
 800DC598 f Course timer
 800DC5A0 h Course selection (00-13)
+800F2BB4 40b Course list
 800F6910 16b Player 1 input
 800F6920 16b Player 2 input
 800F6930 16b Player 3 input
