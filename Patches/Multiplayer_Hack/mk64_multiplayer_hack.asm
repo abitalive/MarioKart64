@@ -505,6 +505,26 @@ scope ScalingFix3p: { // Available registers: t9, at
     nop
 }
 
+scope ScalingFixPost: { // Available registers: t7, at
+  LuiLb(t7, Options+2)
+  Disabled:
+    OriBne(t7, 0x01, at, Fps30) // If option disabled
+    LuiLw(t9, 0x80150114) // Original instructions
+    b End
+    nop
+  Fps30:
+    OriBne(t7, 0x02, at, Fps60) // Else if option set to 30 fps
+    ori t9, r0, 0x02 // Return 2
+    b End
+    nop
+  Fps60:
+    OriBne(t7, 0x03, at, End) // Else if option set to 60 fps
+    ori t9, r0, 0x01 // Return 1
+  End:
+    jr ra
+    nop
+}
+
 // Widescreen
 scope Widescreen: {
   LuiLb(t0, Options+3)
@@ -1013,6 +1033,11 @@ nop
 origin 0x002890
 base 0x80001C90
 jal ScalingFix3p
+nop
+
+origin 0x002490
+base 0x80001890
+jal ScalingFixPost
 nop
 
 // Widescreen
