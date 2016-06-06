@@ -232,6 +232,9 @@ Asciiz("default")
 MenuEntry13Setting2:
 Asciiz("enabled")
 
+TitleString:
+Asciiz("abitalive  weatherton  abney  sully")
+
 fill 0x800040C0 - pc() // Zero fill remainder of resource display function
 
 // Menu
@@ -248,6 +251,12 @@ jal 0x800A8230
 nop
 jal LoadDebugFont
 nop
+Title:
+  ori a0, r0, 0x00
+  ori a1, r0, -0x08
+  la a2, TitleString
+  jal DebugPrintStringCoord
+  nop
 la t0, MenuStrings // Array start
 addiu t1, r0, 0x01 // Entry number
 addiu a1, r0, 0x50 // Y coordinate
