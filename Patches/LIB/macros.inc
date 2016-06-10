@@ -9,6 +9,12 @@ macro Asciiz(string) {
   db {string}, 0x00
 }
 
+macro AsciizAlign(string, length) {
+  variable start(pc())
+  db {string}, 0x00
+  fill {length} - (pc() - start)
+}
+
 macro LaBeq(reg1, i, reg2, label) {
   la {reg2}, {i}
   beq {reg1}, {reg2}, {label}
