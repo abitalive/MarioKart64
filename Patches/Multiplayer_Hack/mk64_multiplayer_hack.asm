@@ -903,6 +903,17 @@ scope VersusAllCupsMenu: {
     OriBne(t0, 0x02, t1, Disabled) // If option enabled
     LuiLw(t0, ModeSelection)
     OriBne(t0, 0x02, t1, Disabled) // If mode == Versus
+    LuiLb(t0, CupSelection)
+    sll t0, t0, 0x02
+    LuiLb(t1, CourseSelection2)
+    addu t1, t0
+    ori t2, r0, 0x14
+    multu t1, t2
+    mflo t1
+    la t0, Option1
+    addu t0, t1
+    la t1, Strings
+    sw t0, 4 (t1)
     la s2, Strings
     b End
     nop
@@ -914,18 +925,34 @@ scope VersusAllCupsMenu: {
 
   Strings:
     dd 0x00000000
-    dd String1
-    dd String2
-    dd String3
-    dd String4
-  String1:
-    Asciiz("CONTINUE GAME")
-  String2:
+    dd 0x00000000
+    dd Option2
+    dd Option3
+    dd Option4
+  Option1:
+    AsciizAlign("CONTINUE TO MMF", 0x14)
+    AsciizAlign("CONTINUE TO KTB", 0x14)
+    AsciizAlign("CONTINUE TO KD", 0x14)
+    AsciizAlign("CONTINUE TO TT", 0x14)
+    AsciizAlign("CONTINUE TO FS", 0x14)
+    AsciizAlign("CONTINUE TO CM", 0x14)
+    AsciizAlign("CONTINUE TO MR", 0x14)
+    AsciizAlign("CONTINUE TO WS", 0x14)
+    AsciizAlign("CONTINUE TO SL", 0x14)
+    AsciizAlign("CONTINUE TO RRY", 0x14)
+    AsciizAlign("CONTINUE TO BC", 0x14)
+    AsciizAlign("CONTINUE TO DKJP", 0x14)
+    AsciizAlign("CONTINUE TO YV", 0x14)
+    AsciizAlign("CONTINUE TO BB", 0x14)
+    AsciizAlign("CONTINUE TO RRD", 0x14)
+    AsciizAlign("CONTINUE TO LR", 0x14)
+  Option2:
     Asciiz("COURSE CHANGE")
-  String3:
+  Option3:
     Asciiz("DRIVER CHANGE")
-  String4:
+  Option4:
     Asciiz("RETRY")
+  Align(4)
 }
 
 // Runs when an option is selected on the versus and battle results screens
