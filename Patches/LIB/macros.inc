@@ -1,5 +1,10 @@
 // Common macros
 
+macro Align(length) {
+  variable i(pc() % {length})
+  fill i
+}
+
 macro Asciiz(string) {
   db {string}, 0x00
 }
