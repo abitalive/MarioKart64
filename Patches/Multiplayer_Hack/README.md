@@ -64,3 +64,9 @@ Mario Kart 64 ROM hack with configuration menu
 
 ### Battle MAP SELECT Options
 - Battle Bomb Phase: Enabled / Disabled
+
+## Building (Windows)
+- Clone or download the repository
+- Put "Mario Kart 64 (U) [!].z64" in the LIB directory
+- Download and extract [these files](https://drive.google.com/file/d/0B1g_ALmgbOzxSDdWVVA4TXdwWlk/view?usp=sharing) to the Multiplayer_Hack directory
+- Drag and drop mk64_multiplayer_hack.asm onto asm.cmd
