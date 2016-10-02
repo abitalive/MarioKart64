@@ -36,9 +36,12 @@ Mario Kart 64 ROM hack with configuration menu
   - Multiplayer SL Penguin: Enabled / Disabled
   - Multiplayer FS Snow: Enabled / Disabled
   - Multiplayer TT Cars: Original / Full
+- Anti-aliasing: Original / Disabled
 
 ### CHARACTER SELECT Options
 - Characters: Menu / Random
+- Allow same character in multiplayer: Enabled / Disabled
+    - Note: Already implemented, requires menu option.
 
 ### GAME SELECT Menu Options
 - Race Laps: Min [3], Max[3]
